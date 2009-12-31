@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>CASH Music UI Tools</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="icon" type="image/png" href="http://cashmusic.org/images/icons/cash.png" /> 
+
+<!-- script src="http://ajax.googleapis.com/ajax/libs/mootools/1.2.4/mootools-yui-compressed.js" type="text/javascript"></script -->
+<script src="http://ajax.googleapis.com/ajax/libs/mootools/1.2.4/mootools.js" type="text/javascript"></script>
+<script src="../Core/uncompressed/cui_core.js" type="text/javascript" id="cui_core"></script>
+<script src="../Core/uncompressed/cui_init.js" type="text/javascript"></script>
+<script src="assets/scripts/soundplayer.js" type="text/javascript"></script>
+<script src="assets/scripts/playlist.js" type="text/javascript"></script>
+
+<link href="assets/css/main.css" rel="stylesheet" type="text/css" /> 
+<link href="assets/css/demo.css" rel="stylesheet" type="text/css" /> 
+
+</head>
+<body>
+
+<div id="wrap">
+	<div id="cash_sitelogo"><a href="http://cashmusic.org/"><img src="assets/images/cash.png" alt="CASH Music" width="30" height="30" /></a></div>
+	<div id="mainspc">
+			
+		<div id="aboutspc">
+			<p>
+				The CASH UI Tools are a collection of JavaScript, CSS, and ActionScript resources. Each component can stand 
+				alone, but they all work together through a UI daemon (cashuid.) If you haven't already, you can download 
+				everything at <a href="http://github.com/cashmusic/CASH-Music-UI-tools" class="external">github</a>.
+			</p><p class="versioninfo">
+				current version: 0.9<br />
+				The 1.0 release will contain some structural changes, but will be released shortly after 0.9 — currently scheduled 
+				for February 1, 2010 — from there all changes will be backwards compatible.
+			</p>
+		</div>
+		
+		<div>
+			<h2>Documentation</h2>
+			<p>
+				All objects are documented via comments, with details on all options, functions, and CSS hooks. Full documentation for all CASH UI Tools coming with 1.0 release. 
+			</p>	
+		</div>
+		<div>
+			<h2>Tests</h2>
+			
+			<h3>01. moviebox</h3>
+			<p>
+			The moviebox component automatically scans the page for links to YouTube, Quicktime movies, Vimeo, and MyspaceTV; parsing the embedable movie from the 
+			target page and displaying it in an overlay lightbox. (This behavior can be overridden and movies can be added manually.) Click each thumbnail to see
+			examples.
+			</p>
+			<div class="oneoffour">
+				<a href="http://youtube.com/watch?v=IntMIqUk1Mg" title="Zan Lyons live in Leeds"><img src="assets/images/moviebox/youtube.jpg" alt="youtube" width="100%"/></a><br />
+				YouTube, default settings.
+			</div><div class="oneoffour">
+				<a href="http://dutchmoney.com/archive/2007/movies/redorblue/trailer.mov" rev="moviebox:width=450,height=300" title="are you red or blue?"><img src="assets/images/moviebox/quicktime.jpg" alt="quicktime" width="100%"/></a><br />
+				Link to Quicktime .mov, custom size. 
+			</div><div class="oneoffour">
+				<a href="http://vimeo.com/175757" rev="moviebox:width=600,height=450"><img src="assets/images/moviebox/vimeo.jpg" alt="vimeo" width="100%"/></a><br />
+				Vimeo, custom size.
+			</div><div class="oneoffour lastone">
+				<a href="http://myspacetv.com/index.cfm?fuseaction=vids.individual&amp;videoid=30674760" title="&lt;b&gt;Dan Le Sac vs. Scroobius Pip&lt;/b&gt;&lt;br /&gt;Look For The Woman"><img src="assets/images/moviebox/myspace.jpg" alt="myspace" width="100%"/></a><br />
+				MyspaceTV, default settings. 
+			</div>
+			
+			<div class="clearall">.</div><br />
+			
+			<h3>02. imagebox</h3>
+			<p>
+			The imagebox component displays an image or collection of images in an overlay lightbox. Simply adding the cui_imagebox class to an image link will fetch the target for display. That
+			same cui_imagebox class will create a collection when added to an element containing multiple image links. Images will scale to fit the window and smoothly adjust the lightbox when
+			changing sizes. The link title is used to create a caption, and further options can be specified in the link's rev option.
+			</p>
+			<div class="oneoffour">
+				<a href="assets/images/imagebox/portugaltheman.jpg" class="cui_imagebox" title="Portugal. The Man" rev="imagebox:collection=justthisone"><img src="assets/images/imagebox/portugaltheman_sm.jpg" alt="portugal the man" width="100%"/></a>
+				<br />
+				A single image.
+			</div><div class="oneoffour">
+				<a href="assets/images/imagebox/freemusic.jpg" class="cui_imagebox" title="50FOOTWAVE: Free Music [cover]" rev="imagebox:collection=scalingimagebox"><img src="assets/images/imagebox/scaling_sm.jpg" alt="scaling imagebox" width="100%"/></a>
+				<a href="assets/images/imagebox/cassettecity.jpg" title="Lushlife: Cassette City [cover]" rev="imagebox:collection=scalingimagebox" class="cui_imagebox ifjsdisplaynone">Lushlife: Cassette City</a>
+				<br />
+				Oversized images will scale.
+			</div><div id="deerhoofcollection" class="oneoftwo lastone cui_imagebox">
+				<a href="assets/images/imagebox/deerhoof_0006.jpg" title="Deerhoof by Daisuke Shimote"><img src="assets/images/imagebox/deerhoof_0006_sm.jpg" alt="deerhoof" width="50" height="50"/></a>
+				<a href="assets/images/imagebox/deerhoof_0009.jpg" title="Deerhoof by Daisuke Shimote"><img src="assets/images/imagebox/deerhoof_0009_sm.jpg" alt="deerhoof" width="50" height="50"/></a>
+				<a href="assets/images/imagebox/deerhoof_0120.jpg" title="Deerhoof by Daisuke Shimote"><img src="assets/images/imagebox/deerhoof_0120_sm.jpg" alt="deerhoof" width="50" height="50"/></a>
+				<a href="assets/images/imagebox/deerhoof_0129.jpg" title="Deerhoof by Daisuke Shimote"><img src="assets/images/imagebox/deerhoof_0129_sm.jpg" alt="deerhoof" width="50" height="50"/></a>
+				<a href="assets/images/imagebox/deerhoof_0374.jpg" title="Deerhoof by Daisuke Shimote"><img src="assets/images/imagebox/deerhoof_0374_sm.jpg" alt="deerhoof" width="50" height="50"/></a>
+				<a href="assets/images/imagebox/deerhoof_9739.jpg" title="Deerhoof by Daisuke Shimote"><img src="assets/images/imagebox/deerhoof_9739_sm.jpg" alt="deerhoof" width="50" height="50"/></a>
+				<a href="assets/images/imagebox/deerhoof_46.jpg" title="Deerhoof by David Garland"><img src="assets/images/imagebox/deerhoof_46_sm.jpg" alt="deerhoof" width="50" height="50"/></a>
+				<a href="assets/images/imagebox/deerhoof_47.jpg" title="Deerhoof by David Garland"><img src="assets/images/imagebox/deerhoof_47_sm.jpg" alt="deerhoof" width="50" height="50"/></a>
+				<a href="assets/images/imagebox/deerhoof_48.jpg" title="Deerhoof by David Garland"><img src="assets/images/imagebox/deerhoof_48_sm.jpg" alt="deerhoof" width="50" height="50"/></a>
+				<a href="assets/images/imagebox/deerhoof_49.jpg" title="Deerhoof by David Garland"><img src="assets/images/imagebox/deerhoof_49_sm.jpg" alt="deerhoof" width="50" height="50"/></a>
+				<br />
+				A &lt;div&gt; full of thumbs/images creating a collection.
+			</div>
+			
+			<div class="clearall">.</div><br />
+			
+			<h3>03. anchor enhancements</h3>
+			<p>
+			The anchor enhancements add minor functionality to links simply by adding classes or basic options: an external link opening in a new tab/window, a popup of a specified size, 
+			an open/close link to slide open a &lt;div&gt; "drawer," and basic XHR requests to fetch local content into a specific element.
+			</p>
+			<div class="oneofthree">
+				<a href="http://cashmusic.org" class="external">external anchor</a><br />
+				<a href="http://50footwave.cashmusic.org/" class="popup" rev="popup:width=750,height=590">linkpopup anchor</a>
+			</div><div class="oneofthree">
+				<a class="cui_drawertoggle ifjsdisplayi" rev="drawer:target=cui_drawer_testspc,altLinkText=sliding drawer (click to close)">sliding drawer (click to open)</a>
+				<div id="cui_drawer_testspc" class="ifjsdisplaynone">drawer test passed</div>
+			</div><div class="oneofthree lastone">
+				<span><a href="assets/linkinside.txt" class="cui_linkinside" rev="linkinside:target=parent">linkinside anchor</a></span><br />
+				<a href="assets/linkinside2.txt" class="cui_linkinside" rev="linkinside:target=cui_anchor_testspc">targeted linkinside anchor</a> <span id="cui_anchor_testspc"></span>
+				<br /><br />
+				The linkinside behavior relies on XHR calls, so will not work if this demo is opened from a local file.
+			</div>
+			
+			<div class="clearall">.</div><br />
+		</div>
+		
+		<h3>04. soundplayer</h3>
+		<p>
+		The soundplayer is a fully style-able event-driven audio player that uses Flash/Flex to provide audio playback but standard DOM
+		elements for interface. Because it relies on a SWF, soundplayer will not work if this demo is opened from a local file.
+		</p>
+		<div id="soundplayerspc"></div>
+		<div id="soundplayer_playlist"></div>
+
+	</div>
+</div>
+
+<div id="footer">
+	<p><b>&copy; 2010 CASH Music.</b> All our code is open-source. <a href="http://github.com/cashmusic/CASH-Music-UI-tools/blob/master/LICENSE">Learn more</a>.</p>
+</div>
+
+</body>
+</html>

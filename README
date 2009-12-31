@@ -1,0 +1,12 @@
+These scripts are in-use throughout cashmusic.org, but need tweaks and
+updates before being released publicly. The general idea is that there's
+a single master JS object that serves as namespace and controller for
+any number of smaller script modules. It also launches external scripts
+as needed, and can auto-attach behaviors to elements. 
+
+I'll enter proper change requirements in Lighthouse, but the big ones
+are that it needs a name change (Mercury/Hg = no good) and should use
+library-safe MooTools functions instead of the generic $() route. 
+
+When done I'll also give the SoundPlayer a round of updates and make it
+jibe with the master object so we can auto attach to MP3 links, etc. 

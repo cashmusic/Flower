@@ -1,0 +1,1 @@
+<div style="padding-left:12px;"><a href="assets/linkinside.txt" class="cui_linkinside" rev="linkinside:target=parent">click again to test auto-attach</a></div>

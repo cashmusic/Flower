@@ -1,0 +1,37 @@
+/* RESETS */
+html {height:100%;margin:0;padding:0;}
+body {height:100%;margin:0;padding:0;background:#fff url(../images/bg.gif) right top no-repeat;font:75%/1.5em helvetica,"helvetica neue",arial,sans-serif;color:#000;text-align:left;}
+img {border:0;}
+a {color:#c00;text-decoration:none;}
+a:hover {text-decoration:underline;}
+h2 {font:2em/1.5em HelveticaNeueLTStd-UltLt,"HelveticaNeueLT Std UltLt","Helvetica Neue Ultra Light","Helvetica Neue",HelveticaNeue-UltraLight,HelveticaLTStd-Light,Helvetica,Arial,sans-serif;font-weight:100;color:#000;margin:0;}
+p {margin:0 0 1em 0;}
+
+#cash_sitelogo {position:absolute;top:8px;right:8px;text-align:right;overflow:hidden;height:46px;width:46px;z-index:2345;}
+#mainspc {position:relative;top:0;left:0;width:53em;height:auto;min-height:100%;margin:0 auto;padding:100px 0 0 0;}
+
+.ifjsdisplayi {display:none;}
+.ifjsdisplayi {display:inline;}
+.ifjsdisplaynone {display:none;}
+.oneoftwo {float:left;width:48%;margin:0;padding:0 4% 0 0;}
+.oneofthree {float:left;width:30%;margin:0;padding:0 4% 0 0;}
+.oneoffour {float:left;width:22%;margin:0;padding:0 4% 0 0;}
+.lastone {padding:0;}
+.clearall {height:1px;overflow:hidden;visibility:hidden;clear:both;}
+
+/* FOOTER (base code taken from cssstickyfooter.com) */
+* {margin-top:0;margin-bottom;padding-top:0;padding-bottom:0;} 
+html, body, #wrap {height:100%;}
+body > #wrap {height:auto;min-height:100%;}
+#mainspc {padding-bottom: 150px;}
+#footer {position:relative;margin-top:-36px;height:36px;color:#666;text-align:left;font-size:0.9em;line-height:1em;clear:both;background-color:#000;}
+#footer p {padding:12px 8px 0px 8px;}
+#footer a {color:#666;}
+#footer a:hover {color:#fff;}
+/* CLEAR FIX*/
+.clearfix:after {content: ".";display:block;height:0;clear:both;visibility:hidden;}
+.clearfix {display:inline-block;}
+/* Hides from IE-mac \*/
+* html .clearfix { height: 1%;}
+.clearfix {display: block;}
+/* End hide from IE-mac */
