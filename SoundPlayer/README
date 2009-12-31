@@ -1,9 +1,0 @@
-This originally started as an update to Michelle Steigerwalt's excellent 
-MooSound script. (http://msteigerwalt.com/widgets/sounds/v1.0/) The code 
-has since been rewritten from the ground up with the original intent to
-keep it compatible with MooSound. The Flex app was rewritten for AS3, at
-which point compatibility was no longer possible and significant changes
-have since been made. 
-
-Warning: there will be more changes to the Sound and Playlist object 
-structures in the next revision.
