@@ -22,44 +22,27 @@ var SoundPlayer = new Class({
 	Implements: [Events, Options],
 
 	options: {
-		controlImages: {
-			// an object specifying URLs for the default control buttons
-			'previous': 'images/previous.png',
-			'next': 'images/next.png',
-			'play': 'images/play.png',
-			'pause': 'images/pause.png'
-		},
-		injectInto: 'soundplayerspc', // the id of the div
-		// the following styles correspond to the default DOM elements creating the UI:
-		//
-		// seekbarSpcStyle - the background of the seekbar, visible during sound load
-		// seekbarStyle - the seekbar itself
-		// positionStyle - the position indicator
-		// controlsStyle - the div containing control buttons
-		//
-		seekbarSpcStyle: {'position':'relative','background-color':'transparent','height':'6px','width':'100%','margin-top':'4px','overflow':'hidden'},
-		seekbarStyle: {'position':'absolute','background-color':'#ccc','height':'6px','width':'0%','cursor':'pointer','z-index':'10'},
-		positionStyle: {'position':'absolute','left':'0%','width':'3px','height':'6px','background-color':'#333','z-index':'15'},
-		controlsStyle: {'margin-top':'8px','text-align':'right'},
-		noInterface: false, // set to true to play playlist without creating a UI
-		statusInterval: 20, // how often the SWF will send status updates, in miliseconds
 		volume: 100, //volume to start at - ranges from 0 - 100 
 		debug: false, // whether or not to display debug messages
+		forceFlash: false,
+		sm2LoadTimeout: 1500,
 		sm2Location: '/assets/scripts/lib/soundmanager2/soundmanager2.js',
 		sm2swfLocation: '/assets/scripts/lib/soundmanager2/swf/'
 	},
 
 	initialize: function(options) {
 		this.setOptions(options);
-		this.flashLoaded = false;
+		this.sm2Loaded = false;
 		this.currentSound = null;
 		this.currentPlaylist = null;
 		this.Playlists = new Hash();
 		this.soundManager = null;
-		if (!this.options.noInterface) {
-			this.createDomElements();
-			this.addControlElements();
-			this.addPlayerEvents();
+		this.sm2LoadTimer = null;
+		this.sm2LoadTime = 0;
+		this.isReady = false; // set to true when soundplayer is ready. used as a check — sm2 fires onready 2x on iphone
+		this.isAppleiDevice = false;
+		if ((navigator.userAgent.match(/iPad/i) != null) || (navigator.userAgent.match(/iPhone/i) != null) || (navigator.userAgent.match(/iPod/i) != null)) {
+			this.isAppleiDevice = true;
 		}
 		window.addEvent('domready', function() {
 			window.SM2_DEFER = true; 
@@ -67,24 +50,41 @@ var SoundPlayer = new Class({
 				'type': 'text/javascript',
 				'src': this.options.sm2Location
 			}).injectInside($$('head')[0]);
-			(function(){ 
-				window.soundManager = new SoundManager(); // Flash expects window.soundManager.
-				soundManager.url = this.options.sm2swfLocation;
-				soundManager.flashVersion = 9; // optional: shiny features (default = 8)
-				soundManager.useFlashBlock = false; // optionally, enable when you're ready to dive in
-				soundManager.useHTML5Audio = true;
-				soundManager.consoleOnly = true;
-				soundManager.onready(function() {
-					if (soundManager.supported()) {
-						this.soundManager = soundManager;
-						this.onFlashLoaded();
-				  } else {
-						this.onError('soundmanager2 loaded but is not supported');
-				  }
-				}.bind(this));
-				soundManager.beginDelayedInit(); // start SM2 init.
-			}.bind(this)).delay(250);
+			this.sm2LoadTimer = (function() {
+				if (typeof(soundManager) != 'undefined') {
+					this.initializeSM2();
+					$clear(this.sm2LoadTimer);
+				} else {
+					this.sm2LoadTime += 50;
+					if (this.sm2LoadTime > this.options.sm2LoadTimeout) {
+						this.onError('soundmanager2 could not be loaded/found.');
+						$clear(this.sm2LoadTimer);
+					}
+				}
+			}).periodical(50,this);
 		}.bind(this));
+	},
+	
+	initializeSM2: function() {
+		window.soundManager = new SoundManager(); // Flash expects window.soundManager.
+		soundManager.url = this.options.sm2swfLocation;
+		soundManager.flashVersion = 9; // optional: shiny features (default = 8)
+		soundManager.useFlashBlock = false; // optionally, enable when you're ready to dive in
+		if (!this.options.forceFlash) {
+			soundManager.useHTML5Audio = true;
+		}
+		soundManager.flashLoadTimeout = this.options.sm2LoadTimeout;
+		//soundManager.consoleOnly = true;
+		soundManager.debugMode = this.options.debug;
+		soundManager.onready(function() {
+			if (soundManager.supported()) {
+				this.soundManager = soundManager;
+				this.onFlashLoaded();
+		  } else {
+				this.onError('soundmanager2 loaded but is not supported');
+		  }
+		}.bind(this));
+		soundManager.beginDelayedInit(); // start SM2 init.
 	},
 	
 	debugMessage: function(msg) {
@@ -111,7 +111,7 @@ var SoundPlayer = new Class({
 	*/
 	
 	loadPlaylist: function(playlistName, sounds, options) {
-		if (!this.flashLoaded) {
+		if (!this.sm2Loaded) {
 			this.onError('flash object not yet loaded. please use the \'ready\' event.');
 		} else {
 			this.currentPlaylist = this.Playlists.get(playlistName);
@@ -230,138 +230,17 @@ var SoundPlayer = new Class({
 	*/
 
 	onFlashLoaded: function() {
-		this.flashLoaded = true;
-		this.soundManager.defaultOptions.volume = this.options.volume;
-		if (!this.options.noInterface) {
-			this.playerSpc.inject(document.id(this.options.injectInto));
+		if (!this.isReady) {
+			this.sm2Loaded = true;
+			this.soundManager.defaultOptions.volume = this.options.volume;
+			this.fireEvent('ready');
+			this.isReady = true;
 		}
-		this.fireEvent('ready');
 	},
 	
 	onError: function(errorMsg) {
-		debugMessage('flower soundplayer error: '+errorMsg);
+		this.debugMessage('flower soundplayer error: '+errorMsg);
 		this.fireEvent('error');
-	},
-	
-	/*
-	*
-	*
-	* user interface functions:
-	*
-	* createDomElements()
-	* Creates all the DOM elements needed to render the player.
-	*
-	* addPlayerEffects()
-	* Adds the effects that make the seek bar grow and the position indicator move
-	*
-	* addPlayerEvents()
-	* adds listeners that create the interface interaction
-	*
-	* addControlElements()
-	* Adds the basic previous,play/pause,next buttons to the player. Split from the 
-	* other DOM elements so it can be more easily extended by a child to add 
-	* functionality or re-skin the standard appearance.
-	*
-	*
-	*/
-
-	createDomElements: function() {
-		this.playerSpc = new Element('div', {'class': 'player'});
-		this.title = new Element('div', {'class':'title'}).inject(this.playerSpc);
-		this.seekbarSpc = new Element('div', {
-			'class':'seekbarSpc',
-			'styles': this.options.seekbarSpcStyle
-		}).inject(this.playerSpc);
-		this.seekbar = new Element('div', {
-			'class':'seekbar',
-			'styles': this.options.seekbarStyle
-		}).inject(this.seekbarSpc);
-		this.position = new Element('div', {
-			'class':'position',
-			'styles': this.options.positionStyle
-		}).inject(this.seekbarSpc);
-		this.controls = new Element('div', {
-			'class':'controls',
-			'styles': this.options.controlsStyle
-		}).inject(this.playerSpc);
-	},
-	
-	addPlayerEvents: function() {
-		this.seekbar.addEvent('click', function(e) {
-			var masterCoords = this.seekbarSpc.getCoordinates();
-			var progressCoords = this.seekbar.getCoordinates();
-			var clickPosition = (e.page.x - progressCoords.left)/masterCoords.width;
-			var ms = clickPosition*this.currentPlaylist.currentSound.sound.duration*(this.currentPlaylist.currentSound.sound.bytesLoaded/this.currentPlaylist.currentSound.sound.bytesTotal);
-			this.jumpCurrentSoundTo(ms);
-		}.bind(this));
-		this.addEvent('play', function(key,title,artist) {
-			if (title) {
-				this.title.set('text',title);
-			} else {
-				this.title.set('text',key);
-			}
-		}.bind(this));
-	},
-	
-	addControlElements: function() {
-		this.previousEl = new Element('img', {
-			'class':'prev',alt:'prev',id:'prev',
-			src:this.options.controlImages.previous,
-			'styles':{'margin-left':'4px','cursor':'pointer'},
-			'events': {
-				'click': function(){
-			       	this.currentPlaylist.playSound('previous');
-		        }.bind(this)
-			}
-		}).inject(this.controls);
-		this.playPauseEl = new Element('img', {
-			'class':'play',alt:'play',id:'play',
-			src:this.options.controlImages.play,
-			'styles':{'margin-left':'4px','cursor':'pointer'},
-			'events': {
-				'click': function(){
-			       	this.toggleCurrentSound();
-		        }.bind(this)
-			}
-		}).inject(this.controls);
-		this.nextEl = new Element('img', {
-			'class':'next',alt:'next',id:'next',
-			src:this.options.controlImages.next,
-			'styles':{'margin-left':'4px','cursor':'pointer'},
-			'events': {
-				'click': function(){
-			       this.currentPlaylist.playSound('forcenext');
-		        }.bind(this)
-			}
-		}).inject(this.controls);
-		
-		// add image click events:
-		this.addEvent('play', function() {
-			this.playPauseEl.set('src',this.options.controlImages.pause);
-		}.bind(this));
-		this.addEvent('resume', function() {
-			this.playPauseEl.set('src',this.options.controlImages.pause);
-		}.bind(this));
-		this.addEvent('pause', function() {
-			this.playPauseEl.set('src',this.options.controlImages.play);
-		}.bind(this));
-		this.addEvent('stop', function() {
-			this.playPauseEl.set('src',this.options.controlImages.play);
-		}.bind(this));
-		
-		// add seekbar/position events:
-		this.addEvent('progress', function(val) {
-			if (val < .95) {
-				var totalwidth = this.seekbarSpc.getSize().x;
-				this.seekbar.setStyle('width',Math.round(totalwidth*val));
-			} else {
-				this.seekbar.setStyle('width','100%');
-			}
-		});
-		this.addEvent('position', function(val) {
-			var totalwidth = this.seekbarSpc.getSize().x;
-			this.position.setStyle('left',Math.round(totalwidth*val));
-		});
 	}
 });
 
@@ -378,16 +257,16 @@ var SoundPlaylist = new Class({
 	Implements: [Options, Events],
 
 	options: {
-		loopPlaylist: true // whether the playlist should loop after completion of the last song
+		loopPlaylist: false // whether the playlist should loop after completion of the last song
 	},
 
 	initialize: function(name,sounds,options) {
 		this.setOptions(options);
 		this.SoundPlayer = null;
-		this.setOptions(options);
 		this.sounds = new Hash();	
 		this.currentSound = null;
 		this.currentKey = -1;
+		this.usingHTML5 = false;
 	},
 	
 	/*
@@ -428,21 +307,47 @@ var SoundPlaylist = new Class({
 				id: theSound.url, 
 				url: theSound.url,
 				onfinish: function() {
+					this.playSound('next'); 
 					this.SoundPlayer.fireEvent('soundEnd');
-					this.playSound('next');
 				}.bind(this),
 				whileplaying: function() {
-					approximatePosition = this.currentSound.sound.position / this.currentSound.sound.duration;
+					if (!this.currentSound.sound.loaded) {
+						currentDuration = this.currentSound.sound.durationEstimate;
+					} else {
+						currentDuration = this.currentSound.sound.duration;
+					}
+					approximatePosition = this.currentSound.sound.position / currentDuration;
 					this.SoundPlayer.fireEvent('position', approximatePosition);
+					
+					currentDuration = Math.round(currentDuration / 1000);
+					figureSeconds = Math.floor(currentDuration % 60);
+					figureSeconds = (String(figureSeconds).length < 2) ? figureSeconds = String("0" + figureSeconds) :  figureSeconds = String(figureSeconds);
+					currentDuration = Math.floor(currentDuration / 60) + ':' + figureSeconds;
+					
+					currentPosition = Math.round(this.currentSound.sound.position / 1000);
+					figureSeconds = Math.floor(currentPosition % 60);
+					figureSeconds = (String(figureSeconds).length < 2) ? figureSeconds = String("0" + figureSeconds) :  figureSeconds = String(figureSeconds);
+					currentPosition = Math.floor(currentPosition / 60) + ':' + figureSeconds;
+					
+					this.SoundPlayer.fireEvent('positiontime', [currentPosition + ' / ' + currentDuration,this.currentSound.sound.url]);
+					if (this.usingHTML5) {
+						loadPercentage = this.currentSound.sound.bytesLoaded / this.currentSound.sound.bytesTotal;
+						this.SoundPlayer.fireEvent('progress', loadPercentage);
+					}
 				}.bind(this),
 				whileloading: function() {
-					loadPercentage = this.currentSound.sound.bytesLoaded / this.currentSound.sound.bytesTotal;
-					this.SoundPlayer.fireEvent('progress', loadPercentage);
+					if (!this.usingHTML5) {
+						loadPercentage = this.currentSound.sound.bytesLoaded / this.currentSound.sound.bytesTotal;
+						this.SoundPlayer.fireEvent('progress', loadPercentage);
+					}
 				}.bind(this),
 			}),
 			title: theSound.title,
 			artist: theSound.artist
 		});
+		if (this.sounds.get(theSound.url).sound.isHTML5) {
+			this.usingHTML5 = true;
+		}
 		return this;
 	},
 
@@ -482,6 +387,7 @@ var SoundPlaylist = new Class({
 			key = 0;
 		}
 		if (this.currentSound) {
+			this.currentSound.sound.setPosition(0);
 			this.stopCurrentSound();
 		}
 		if (key !== false) {
@@ -489,7 +395,6 @@ var SoundPlaylist = new Class({
 			sound = this.sounds.get(soundid);
 			this.currentKey = key;
 			this.currentSound = sound;
-			this.currentSound.sound.position = 0;
 			this.playCurrentSound();
 		}
 	},
@@ -502,8 +407,13 @@ var SoundPlaylist = new Class({
 	},
 	
 	playCurrentSound: function() {
+		if (this.currentSound.sound.paused) {
+			this.currentSound.sound.setPosition(0);
+			this.currentSound.sound.resume();
+		} else {
 			this.currentSound.sound.play();
-			this.SoundPlayer.fireEvent('play',[this.currentSound.sound.url,this.currentSound.title,this.currentSound.artist]);
+		}
+		this.SoundPlayer.fireEvent('play',[this.currentSound.sound.url,this.currentSound.title,this.currentSound.artist]);
 	},
 	
 	pauseCurrentSound: function() {
@@ -514,8 +424,18 @@ var SoundPlaylist = new Class({
 	},
 	
 	stopCurrentSound: function() {
-		this.currentSound.sound.stop();
-		this.SoundPlayer.fireEvent('stop');
+		if (this.currentSound.sound.playState != 0) {
+			/*
+			this.currentSound.sound.setPosition(0);
+			if (this.currentSound.sound.isHTML5) {
+				// HTML5 has no true "stop" — unloading the media can cause warnings that confuse and bewilder the iphone
+				this.currentSound.sound.pause();
+			} else {
+			*/
+				this.currentSound.sound.stop();
+			//}
+			this.SoundPlayer.fireEvent('stop');
+		}
 	},
 	
 	toggleCurrentSound: function() {
@@ -541,5 +461,376 @@ var SoundPlaylist = new Class({
 		}
 		this.fireEvent('play',[this.currentSound.sound.url,this.currentSound.title,this.currentSound.artist]);
 	},
+
+});
+
+
+var SoundPlayerUI = new Class({ 
+
+/*
+*
+* SoundPlayerUI class:
+*
+*
+*/
+
+	Implements: [Options, Events],
+	
+	options: {
+		debug: false
+	},
+	
+	initialize: function(playlist,targetElement,options) {
+		this.setOptions(options);
+		if (this.options.playlist != false) {
+			this.supportsAppleiDevices = true;
+			this.targetElement = targetElement;
+			this.playlist = playlist;
+			this.isAppleiDevice = this.playlist.SoundPlayer.isAppleiDevice;
+			this.allSoundKeys = this.playlist.sounds.getKeys();
+		} else {
+			if (this.options.debug) {
+				this.debugMessage('No playlist specified, cannot draw UI.')
+			}
+		}
+	},
+	
+	debugMessage: function(msg) {
+		// a simple way to dump to the console when testing should expand to include
+		// more runtime information
+		if (typeof(console) == 'object' && this.options.debug) {
+			console.log(msg);
+		}
+	}
+
+});
+
+var _defaultSoundPlayerUI = new Class({ 
+
+/*
+*
+* _defaultSoundPlayerUI class:
+*
+*
+*/
+	Extends: SoundPlayerUI,
+	Implements: [Options, Events],
+	
+	options: {
+		debug: false,
+		forceAppleiDevice: false,
+		controlImages: {
+			// an object specifying URLs for the default control buttons
+			'previous': '/assets/images/previous.png',
+			'next': '/assets/images/next.png',
+			'play': '/assets/images/play.png',
+			'pause': '/assets/images/pause.png'
+		},
+		customElementStyles: null //placeholder — identical Hash to below, applied a second time for user customization of existing styles
+	},
+	
+	initialize: function(playlist,targetElement,options) {
+		this.parent(playlist,targetElement,options);
+		this.setOptions(options);
+		if (this.options.forceAppleiDevice) {
+			this.isAppleiDevice = true;
+		}
+		this.allPlaylistLi = new Hash();
+		this.notesSpan = new Element('span',{
+			text:'(tap to stop)',
+			'styles':{'display':'none','color':'#111','padding-left':'1em'}
+		});
+		// the following styles correspond to the default DOM elements creating the UI:
+		//
+		// seekbarSpcStyle - the background of the seekbar, visible during sound load
+		// seekbarStyle - the seekbar itself
+		// positionStyle - the position indicator
+		// controlsStyle - the div containing control buttons
+		//
+		this.elementStyles = new Hash({
+			'seekbarSpc': {'position':'relative','background-color':'#000','height':'9px','width':'100%','margin-top':'4px','overflow':'hidden'},
+			'seekbar': {'position':'absolute','background-color':'#00acf1','height':'9px','width':'0%','cursor':'pointer','z-index':'10'},
+			'position': {'position':'absolute','left':'0%','width':'3px','height':'9px','background-color':'#fff402','z-index':'15'},
+			'controls': {'margin-top':'8px','text-align':'right'},
+			'iDeviceLiStyles': {'background':'-webkit-gradient(linear, left top, left bottom, from(#666), to(#222))','color':'#fff'},
+			'iDeviceLiStylesClicked': {'background':'-webkit-gradient(linear, left top, left bottom, from(#00acf1), to(#002939))','color':'#ed028d'},
+			'controlImageStyles': {'margin-left':'4px','cursor':'pointer'}
+		});
+	},
+	
+	//
+	//
+	//
+	//
+	//
+	//
+	// All Playlist functions ->
+	
+	clearAllPlaylistLi: function() {
+		this.notesSpan.setStyle('display','none');
+		this.allPlaylistLi.each(function(li) {
+			li.get('li').setStyles(this.elementStyles.get('iDeviceLiStyles'));
+			li.get('titlespan').setStyle('color','#fff');
+			li.get('timespan').set('html','');
+		}.bind(this));
+	},
+
+	handlePlaylistLiClick: function(url) {
+		var sound = this.playlist.sounds.get(url);
+		var forcePlay = false;
+		if (this.playlist.currentSound) {
+			if (this.playlist.currentSound.sound.playState == 0 && this.playlist.currentKey == this.allSoundKeys.indexOf(url)) {
+				forcePlay = true;
+			}
+		}
+		if (this.playlist.currentKey != this.allSoundKeys.indexOf(url) || forcePlay) {
+			if (this.playlist.currentSound) {
+				this.playlist.currentSound.sound.setPosition(0);
+				this.playlist.stopCurrentSound();
+			}		
+			this.playlist.currentKey = this.allSoundKeys.indexOf(url);
+			this.playlist.currentSound = sound;
+			this.playlist.playCurrentSound();
+			this.highlightPlayingLi(url)
+		} else {
+			this.playlist.stopCurrentSound();
+			this.clearAllPlaylistLi();
+		}
+	},
+	
+	highlightPlayingLi: function(url) {
+		this.clearAllPlaylistLi();
+		var liObj = this.allPlaylistLi.get(url);
+		var tmpTimeSpan = liObj.get('timespan');
+		var tmpTitleSpan = liObj.get('titlespan');
+		var tmpLi = liObj.get('li');
+		if (tmpTimeSpan.get('html') == '') {
+			tmpTimeSpan.set('html','loading...');
+		}
+		tmpLi.setStyles(this.elementStyles.get('iDeviceLiStylesClicked'));
+		tmpTitleSpan.setStyle('color','#000');
+		this.notesSpan.inject(tmpLi);
+		this.notesSpan.setStyle('display','inline');
+	},
+	
+	addPlaylistElements: function() {
+		if (!this.isAppleiDevice) {
+			this.mainPlaylistUl = new Element('ol',{'styles':{'font-size':'0.85em','padding':0,'margin':0,'list-style-type':'decimal-leading-zero'}});
+			this.playlist.sounds.each(function(track,index) { 
+				var tmpLi = new Element('li',{'styles':{'list-style-position':'inside'}}).inject(this.mainPlaylistUl);
+				var tmpTitleSpan = new Element('span',{
+					text:track.title,
+					'styles':{'cursor':'pointer'},
+					'events':{
+						'click': function(){
+							sound = this.playlist.sounds.get(track.sound.url);
+							if (this.playlist.currentSound) {
+								this.playlist.currentSound.sound.setPosition(0);
+								this.playlist.stopCurrentSound();
+							}
+							this.playlist.currentKey = this.allSoundKeys.indexOf(track.sound.url);
+							this.playlist.currentSound = sound;
+							this.playlist.playCurrentSound();
+				        }.bind(this)
+					}
+				}).inject(tmpLi);;
+			},this);
+			
+			this.mainPlaylistUl.inject(document.id(this.targetElement));
+		} else {
+			this.mainPlaylistUl = new Element('ol',{'styles':{'font-size':'0.85em','padding':0,'margin':0,'list-style-type':'decimal-leading-zero'}});
+			this.playlist.sounds.each(function(track,index) { 
+				var tmpLi = new Element('li',{'styles':{
+					'list-style-position':'inside',
+					'background':'-webkit-gradient(linear, left top, left bottom, from(#666), to(#222))',
+					'border':'1px solid #777',
+					'-webkit-border-radius':'3px',
+					'margin-bottom':'4px',
+					'padding':'3px',
+					'height':'4em',
+					'cursor':'pointer',
+					'color':'#fff'
+					}
+				}).inject(this.mainPlaylistUl);
+				var tmpTitleSpan = new Element('span',{
+					text:track.title,
+					'styles':{'font-size':'1.5em','line-height':'1em','font-weight':'bold','display':'block'}
+				}).inject(tmpLi);
+				var tmpTimeSpan = new Element('span',{'styles':{'padding-left':'1.95em','color':'#fff'}}).inject(tmpLi);
+				tmpLi.addEvent('click', function(){
+		        	this.handlePlaylistLiClick(track.sound.url);
+		        }.bind(this));
+				this.allPlaylistLi.set(track.sound.url,new Hash({'li':tmpLi,'titlespan':tmpTitleSpan,'timespan':tmpTimeSpan}));
+			},this);
+			
+			this.mainPlaylistUl.inject(document.id(this.targetElement));
+		}
+	},
+	
+	addPlaylistEvents: function() {
+		if (!this.isAppleiDevice) {
+			// placeholder. do bold/color for current track in std playlist
+		} else {
+			this.playlist.SoundPlayer.addEvent('play',function(url){
+				this.highlightPlayingLi(url);
+			}.bind(this));
+			
+			this.playlist.SoundPlayer.addEvent('positiontime',function(val,url){
+				this.allPlaylistLi.get(url).get('timespan').set('html',val);
+			}.bind(this));
+		}
+	},
+	
+	drawPlaylist: function() {
+		this.addPlaylistElements();
+		this.addPlaylistEvents();
+	},
+	
+	//
+	//
+	//
+	//
+	//
+	//
+	// All Controller (seekbar + buttons) functions ->
+	
+	addControllerElements: function() {
+		this.playerSpc = new Element('div', {'class': 'flower_soundplayer'});
+		this.soundtitle = new Element('div', {'class':'flower_soundplayer_title','html':'&nbsp;'}).inject(this.playerSpc);
+		this.soundtime = new Element('div', {'class':'flower_soundplayer_time','html':'&nbsp;'}).inject(this.playerSpc);
+		this.seekbarSpc = new Element('div', {
+			'class':'flower_soundplayer_seekbarcontainer',
+			'styles': this.elementStyles.get('seekbarSpc')
+		}).inject(this.playerSpc);
+		this.seekbar = new Element('div', {
+			'class':'flower_soundplayer_seekbar',
+			'styles': this.elementStyles.get('seekbar')
+		}).inject(this.seekbarSpc);
+		this.position = new Element('div', {
+			'class':'flower_soundplayer_positionmarker',
+			'styles': this.elementStyles.get('position')
+		}).inject(this.seekbarSpc);
+		this.controls = new Element('div', {
+			'class':'flower_soundplayer_controls',
+			'styles': this.elementStyles.get('controls')
+		}).inject(this.playerSpc);
+		
+		// play/pause/next buttons
+		// click events are included here because they're the only reason for the elements to exist
+		this.previousEl = new Element('img', {
+			'class':'prev',alt:'prev',id:'prev',
+			src:this.options.controlImages.previous,
+			'styles': this.elementStyles.get('controlImageStyles'),
+			'events': {
+				'click': function(){
+			       	this.playlist.playSound('previous');
+		        }.bind(this)
+			}
+		}).inject(this.controls);
+		this.playPauseEl = new Element('img', {
+			'class':'play',alt:'play',id:'play',
+			src:this.options.controlImages.play,
+			'styles': this.elementStyles.get('controlImageStyles'),
+			'events': {
+				'click': function(){
+			       	this.playlist.toggleCurrentSound();
+		        }.bind(this)
+			}
+		}).inject(this.controls);
+		this.nextEl = new Element('img', {
+			'class':'next',alt:'next',id:'next',
+			src:this.options.controlImages.next,
+			'styles': this.elementStyles.get('controlImageStyles'),
+			'events': {
+				'click': function(){
+					this.playlist.playSound('forcenext');
+		        }.bind(this)
+			}
+		}).inject(this.controls);
+		
+		this.playerSpc.inject(document.id(this.targetElement));
+	},
+	
+	addControllerEvents: function() {
+		this.seekbar.addEvent('click', function(e) {
+			var currentDuration;
+			if (!this.playlist.currentSound.sound.loaded) {
+				currentDuration = this.playlist.currentSound.sound.durationEstimate;
+			} else {
+				currentDuration = this.playlist.currentSound.sound.duration;
+			}
+			var masterCoords = this.seekbarSpc.getCoordinates();
+			var progressCoords = this.seekbar.getCoordinates();
+			var clickPosition = (e.page.x - progressCoords.left)/masterCoords.width;
+			var ms = clickPosition*currentDuration;
+			this.playlist.jumpCurrentSoundTo(ms);
+		}.bind(this));
+	
+		this.playlist.SoundPlayer.addEvent('play', function(key,title,artist) {
+			if (title) {
+				this.soundtitle.set('text',title);
+			} else {
+				this.soundtitle.set('text',key);
+			}
+		}.bind(this));
+		
+		// add seekbar/position events:
+		this.playlist.SoundPlayer.addEvent('progress', function(val) {
+			if (val < .95) {
+				var totalwidth = this.seekbarSpc.getSize().x;
+				this.seekbar.setStyle('width',Math.round(totalwidth*val));
+			} else {
+				this.seekbar.setStyle('width','100%');
+			}
+		}.bind(this));
+		
+		this.playlist.SoundPlayer.addEvent('position', function(val) {
+			var totalwidth = this.seekbarSpc.getSize().x;
+			this.position.setStyle('left',Math.round(totalwidth*val));
+		}.bind(this));
+		
+		this.playlist.SoundPlayer.addEvent('positiontime',function(val){
+			this.soundtime.set('html',val);
+		}.bind(this));
+		
+		// add image play/pause state events:
+		this.playlist.SoundPlayer.addEvent('play', function() {
+			this.playPauseEl.set('src',this.options.controlImages.pause);
+		}.bind(this));
+
+		this.playlist.SoundPlayer.addEvent('resume', function() {
+			this.playPauseEl.set('src',this.options.controlImages.pause);
+		}.bind(this));
+
+		this.playlist.SoundPlayer.addEvent('pause', function() {
+			this.playPauseEl.set('src',this.options.controlImages.play);
+		}.bind(this));
+
+		this.playlist.SoundPlayer.addEvent('stop', function() {
+			this.playPauseEl.set('src',this.options.controlImages.play);
+		}.bind(this));
+	},
+	
+	drawController: function() {
+		this.addControllerElements();
+		this.addControllerEvents();
+	},
+	
+	//
+	//
+	//
+	//
+	//
+	//
+	// Final logic to draw the UI
+	
+	drawUI: function() {
+		if (this.isAppleiDevice) {
+			this.drawPlaylist();
+		} else {
+			this.drawController();
+			this.drawPlaylist();
+		}
+	}
 
 });
