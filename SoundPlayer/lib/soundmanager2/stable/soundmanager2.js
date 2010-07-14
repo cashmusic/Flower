@@ -749,7 +749,7 @@ function SoundManager(smURL, smID) {
     _appendSuccess = false;
     _disabled = false;
     _s.swfLoaded = false;
-    _s.soundIDs = [];
+    _s.soundIDs = {};
     _s.sounds = [];
     _s.o = null;
     for (i = _onready.length; i--;) {
@@ -1851,20 +1851,25 @@ function SoundManager(smURL, smID) {
           _t.url = null;
         }
       }
+      if (typeof _t._iO.url === 'undefined') {
+        _t._iO.url = _t.url;
+      }
       _s._wD('soundManager.load(): ' + _t._iO.url, 1);
       if (_t._iO.url === _t.url && _t.readyState !== 0 && _t.readyState !== 2) {
         _wDS('onURL', 1);
         return _t;
       }
-      _t._lastURL = _t.url;
+      _t.url = _t._iO.url;
+      _t._lastURL = _t._iO.url;
       _t.loaded = false;
       _t.readyState = 1;
       _t.playState = 0; // (oOptions.autoPlay?1:0); // if autoPlay, assume "playing" is true (no way to detect when it actually starts in Flash unless onPlay is watched?)
       if (_html5OK(_t._iO)) {
         _s._wD('HTML 5 load: '+_t._iO.url);
         oS = _t._setup_html5(_t._iO);
-        oS.load();
+        // if autoplay..
         if (_t._iO.autoPlay) {
+          // oS.load(); // required? Uncertain.
           _t.play();
         }
       } else {
@@ -1985,12 +1990,13 @@ function SoundManager(smURL, smID) {
             // HTML5 double-play bug otherwise.
             if (!_t._iO.serverURL) {
               _t._iO.autoPlay = true;
-              _t.load(_t._iO);
+              _t.load(_t._iO); // try to get this sound playing ASAP
             }
           } else {
-            _t.load(_t._iO);
             _t.readyState = 1;
           }
+          // if (typeof oOptions.autoPlay=='undefined') _tO.autoPlay = true; // only set autoPlay if unspecified here
+          // _t.load(_t._iO); // moved into flash-only block
         } else if (_t.readyState === 2) {
           _s._wD(fN + 'Could not load "' + _t.sID + '" - exiting', 2);
           return _t;
@@ -2414,6 +2420,11 @@ function SoundManager(smURL, smID) {
         }
       }, false);
 
+      _add('end', function(e) {
+        _s._wD('HTML5::end: '+_t.sID);
+        _t._onfinish();
+      }, false);
+
       _add('error', function(e) {
         if (_a) {
           _s._wD('HTML5::error: '+_a.error.code);
@@ -2488,6 +2499,7 @@ function SoundManager(smURL, smID) {
       var oData = [], i, j;
       for (i = 0, j = oID3PropNames.length; i < j; i++) {
         oData[oID3PropNames[i]] = oID3Data[i];
+        // _s._wD(oID3PropNames[i]+': '+oID3Data[i]);
       }
       _t.id3 = _mergeObjects(_t.id3, oData);
       if (_t._iO.onid3) {
@@ -2503,6 +2515,7 @@ function SoundManager(smURL, smID) {
       if (_t.playState === 0 && nPosition > 0) {
         // can happen at the end of a video where nPosition === 33 for some reason, after finishing.???
         // can also happen with a normal stop operation. This resets the position to 0.
+        // _s._writeDebug('Note: Not playing, but position = '+nPosition);
         nPosition = 0;
       }
       _t.position = nPosition;
@@ -2540,6 +2553,7 @@ function SoundManager(smURL, smID) {
           _t._iO.whileplaying.apply(_t); // flash may call after actual finish
         }
 
+        // if (_t.loaded && _t._iO.onbeforefinish && _t._iO.onbeforefinishtime && !_t.didBeforeFinish && _t.duration - _t.position <= _t._iO.onbeforefinishtime) {
         if ((_t.loaded || (!_t.loaded && _t._iO.isMovieStar)) && _t._iO.onbeforefinish && _t._iO.onbeforefinishtime && !_t.didBeforeFinish && _t.duration - _t.position <= _t._iO.onbeforefinishtime) {
           _s._wD('duration-position &lt;= onbeforefinishtime: ' + _t.duration + ' - ' + _t.position + ' &lt= ' + _t._iO.onbeforefinishtime + ' (' + (_t.duration - _t.position) + ')');
           _t._onbeforefinish();
@@ -2649,10 +2663,10 @@ function SoundManager(smURL, smID) {
           if (_t._iO.onfinish) {
             _s._wD('SMSound._onfinish(): "' + _t.sID + '"');
             _t._iO.onfinish.apply(_t);
-          } else if (_t.isHTML5) {
-            // assume safe to unload, etc.
-            _t.unload();
           }
+        }
+        if (_t.isHTML5) {
+          _t.unload();
         }
       }
     };
