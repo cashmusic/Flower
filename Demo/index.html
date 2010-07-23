@@ -7,8 +7,8 @@
 
 <!-- script src="http://ajax.googleapis.com/ajax/libs/mootools/1.2.4/mootools-yui-compressed.js" type="text/javascript"></script -->
 <script src="http://ajax.googleapis.com/ajax/libs/mootools/1.2.4/mootools.js" type="text/javascript"></script>
-<script src="../Core/uncompressed/cui_core.js" type="text/javascript" id="cui_core"></script>
-<script src="../Core/uncompressed/cui_init.js" type="text/javascript"></script>
+<script src="../uncompressed/flower_core.js" type="text/javascript" id="flower_core"></script>
+<script src="../uncompressed/flower_init.js" type="text/javascript"></script>
 <script src="assets/scripts/soundplayer.js" type="text/javascript"></script>
 <script src="assets/scripts/playlist.js" type="text/javascript"></script>
 
@@ -67,20 +67,20 @@
 			
 			<h3>02. imagebox</h3>
 			<p>
-			The imagebox component displays an image or collection of images in an overlay lightbox. Simply adding the cui_imagebox class to an image link will fetch the target for display. That
-			same cui_imagebox class will create a collection when added to an element containing multiple image links. Images will scale to fit the window and smoothly adjust the lightbox when
+			The imagebox component displays an image or collection of images in an overlay lightbox. Simply adding the flower_imagebox class to an image link will fetch the target for display. That
+			same flower_imagebox class will create a collection when added to an element containing multiple image links. Images will scale to fit the window and smoothly adjust the lightbox when
 			changing sizes. The link title is used to create a caption, and further options can be specified in the link's rev option.
 			</p>
 			<div class="oneoffour">
-				<a href="assets/images/imagebox/portugaltheman.jpg" class="cui_imagebox" title="Portugal. The Man" rev="imagebox:collection=justthisone"><img src="assets/images/imagebox/portugaltheman_sm.jpg" alt="portugal the man" width="100%"/></a>
+				<a href="assets/images/imagebox/portugaltheman.jpg" class="flower_imagebox" title="Portugal. The Man" rev="imagebox:collection=justthisone"><img src="assets/images/imagebox/portugaltheman_sm.jpg" alt="portugal the man" width="100%"/></a>
 				<br />
 				A single image.
 			</div><div class="oneoffour">
-				<a href="assets/images/imagebox/freemusic.jpg" class="cui_imagebox" title="50FOOTWAVE: Free Music [cover]" rev="imagebox:collection=scalingimagebox"><img src="assets/images/imagebox/scaling_sm.jpg" alt="scaling imagebox" width="100%"/></a>
-				<a href="assets/images/imagebox/cassettecity.jpg" title="Lushlife: Cassette City [cover]" rev="imagebox:collection=scalingimagebox" class="cui_imagebox ifjsdisplaynone">Lushlife: Cassette City</a>
+				<a href="assets/images/imagebox/freemusic.jpg" class="flower_imagebox" title="50FOOTWAVE: Free Music [cover]" rev="imagebox:collection=scalingimagebox"><img src="assets/images/imagebox/scaling_sm.jpg" alt="scaling imagebox" width="100%"/></a>
+				<a href="assets/images/imagebox/cassettecity.jpg" title="Lushlife: Cassette City [cover]" rev="imagebox:collection=scalingimagebox" class="flower_imagebox ifjsdisplaynone">Lushlife: Cassette City</a>
 				<br />
 				Oversized images will scale.
-			</div><div id="deerhoofcollection" class="oneoftwo lastone cui_imagebox">
+			</div><div id="deerhoofcollection" class="oneoftwo lastone flower_imagebox">
 				<a href="assets/images/imagebox/deerhoof_0006.jpg" title="Deerhoof by Daisuke Shimote"><img src="assets/images/imagebox/deerhoof_0006_sm.jpg" alt="deerhoof" width="50" height="50"/></a>
 				<a href="assets/images/imagebox/deerhoof_0009.jpg" title="Deerhoof by Daisuke Shimote"><img src="assets/images/imagebox/deerhoof_0009_sm.jpg" alt="deerhoof" width="50" height="50"/></a>
 				<a href="assets/images/imagebox/deerhoof_0120.jpg" title="Deerhoof by Daisuke Shimote"><img src="assets/images/imagebox/deerhoof_0120_sm.jpg" alt="deerhoof" width="50" height="50"/></a>
@@ -106,11 +106,11 @@
 				<a href="http://cashmusic.org" class="external">external anchor</a><br />
 				<a href="http://50footwave.cashmusic.org/" class="popup" rev="popup:width=750,height=590">linkpopup anchor</a>
 			</div><div class="oneofthree">
-				<a class="cui_drawertoggle ifjsdisplayi" rev="drawer:target=cui_drawer_testspc,altLinkText=sliding drawer (click to close)">sliding drawer (click to open)</a>
-				<div id="cui_drawer_testspc" class="ifjsdisplaynone">drawer test passed</div>
+				<a class="flower_drawertoggle ifjsdisplayi" rev="drawer:target=flower_drawer_testspc,altLinkText=sliding drawer (click to close)">sliding drawer (click to open)</a>
+				<div id="flower_drawer_testspc" class="ifjsdisplaynone">drawer test passed</div>
 			</div><div class="oneofthree lastone">
-				<span><a href="assets/linkinside.txt" class="cui_linkinside" rev="linkinside:target=parent">linkinside anchor</a></span><br />
-				<a href="assets/linkinside2.txt" class="cui_linkinside" rev="linkinside:target=cui_anchor_testspc">targeted linkinside anchor</a> <span id="cui_anchor_testspc"></span>
+				<span><a href="assets/linkinside.txt" class="flower_linkinside" rev="linkinside:target=parent">linkinside anchor</a></span><br />
+				<a href="assets/linkinside2.txt" class="flower_linkinside" rev="linkinside:target=flower_anchor_testspc">targeted linkinside anchor</a> <span id="flower_anchor_testspc"></span>
 				<br /><br />
 				The linkinside behavior relies on XHR calls, so will not work if this demo is opened from a local file.
 			</div>

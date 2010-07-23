@@ -41,15 +41,15 @@ POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-var CUIImagebox = new Class({
+var FlowerImagebox = new Class({
 	/*
-	Class CUIImagebox
+	Class FlowerImagebox
 	
-	CUI Imagebox is an image gallery script that automatically collects images
+	Flower Imagebox is an image gallery script that automatically collects images
 	and displays those collections in an overlay box. It supports full or dynamic 
 	pre-loading, multiple collections, key controlled collection viewing, and fixed 
-	width/height. Intended to be auto-initiated with links of class 'CUIImagebox', 
-	or contained within a DIV of class 'CUIImagebox', the CUI Imagebox script should
+	width/height. Intended to be auto-initiated with links of class 'FlowerImagebox', 
+	or contained within a DIV of class 'FlowerImagebox', the Flower Imagebox script should
 	be a low-maintenance addition to a page.
 	
 	
@@ -115,7 +115,7 @@ var CUIImagebox = new Class({
 	• .cui_overlaycontrollink
 	
 	*/
-	Extends: CUIOverlay,
+	Extends: FlowerOverlay,
 	Implements: Options,
 
 	options: {
@@ -132,7 +132,7 @@ var CUIImagebox = new Class({
 		this.donotdebugoptions = false;
 		// uses cui_utility module for checkForMobile() call. if using as standalone script
 		// simply copy that function into this class for efficiency 
-		this.ismobile = cashuid.getModule('utility').checkForMobile();
+		this.ismobile = flowerUID.getModule('utility').checkForMobile();
 		// set global state of imagebox (0 = uninitiated, 1 = hidden, 10 = visible/busy, 11 = visible/normal)
 		this.state = 0;
 		this.setOptions(options);
@@ -414,7 +414,7 @@ var CUIImagebox = new Class({
 		
 		*/
 		this.currentImg = new Element('img', {
-			'class': 'CUIImageboximg',
+			'class': 'FlowerImageboximg',
 			'src': '',
 			'alt': '',
 			'styles': {
@@ -632,10 +632,10 @@ var CUIImagebox = new Class({
 	}
 });
 window.addEvent('domready', function(){
-	if (typeof(cashuid) == 'object') {
-		cashuid.registerModule(CUIImagebox,'imagebox');
+	if (typeof(flowerUID) == 'object') {
+		flowerUID.registerModule(FlowerImagebox,'imagebox');
 	} else {
-		var imagebox = new CUIImagebox();
+		var imagebox = new FlowerImagebox();
 		// auto-attach to .cui_imagebox links and .cui_imagebox div links
 		$$('a.cui_imagebox,div.cui_imagebox').each(function(element){
 			imagebox.attachToElement(element);

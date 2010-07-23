@@ -8,9 +8,9 @@ more information/downloads available at: http://uitools.cashmusic.org
 
 revisions:
 • 1.0: initial release. includes:
-			CUILinkExternal (v1.1),
-			CUILinkPopup (v1.0),
-      		CUILinkInside(v1.1)
+			FlowerLinkExternal (v1.1),
+			FlowerLinkPopup (v1.0),
+      		FlowerLinkInside(v1.1)
 
 requires:
 • mootools v 1.2.4
@@ -43,9 +43,9 @@ POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-var CUILinkExternal = new Class({
+var FlowerLinkExternal = new Class({
 	/*
-	Class CUILinkExternal
+	Class FlowerLinkExternal
 	
 	replaces non-standard target="_blank" with similar functionality
 	
@@ -65,9 +65,9 @@ var CUILinkExternal = new Class({
 	}
 });
 
-var CUILinkPopup = new Class({
+var FlowerLinkPopup = new Class({
 	/*
-	Class CUILinkPopup
+	Class FlowerLinkPopup
 	
 	opens a link in a popup window. defaults to a 480x320 window size, but
 	all options can be overridden by specifying the popup options in the rev 
@@ -101,9 +101,9 @@ var CUILinkPopup = new Class({
 	}
 });
 
-var CUILinkInside = new Class({
+var FlowerLinkInside = new Class({
 	/*
-	Class CUILinkInside
+	Class FlowerLinkInside
 	
 	initiates a simple ajax content refresh. defaults to replacing the
 	html of the nearest parent div of the specified link (will traverse 
@@ -172,7 +172,7 @@ var CUILinkInside = new Class({
 	}
 });
 
-var CUIDrawer = new Class({
+var FlowerDrawer = new Class({
 	Implements: Options,
 	
 	options: {
@@ -188,27 +188,27 @@ var CUIDrawer = new Class({
 	closedrawer: function(drawer) {
 		drawer.setStyle('height', 1);
 		drawer.setStyle('display', 'none');
-		drawer.store('CUIDrawer_state',1);			
+		drawer.store('FlowerDrawer_state',1);			
 	},
 	
 	toggle: function(drawer) {
 		var stripheight;
-		if (drawer.retrieve('CUIDrawer_state') == 11) {
+		if (drawer.retrieve('FlowerDrawer_state') == 11) {
 			stripheight = drawer.getScrollSize().y;
-			drawer.store('CUIDrawer_state',10);
+			drawer.store('FlowerDrawer_state',10);
 			drawer.setStyle('height', stripheight);
 			drawer.get('tween', {property: 'height',duration: 400}).start(stripheight,1).chain(function(){
 				drawer.setStyle('display', 'none');
-				drawer.store('CUIDrawer_state',1);
+				drawer.store('FlowerDrawer_state',1);
 			}.bind(this));
-		} else if (drawer.retrieve('CUIDrawer_state') == 1) {
-			drawer.store('CUIDrawer_state',10);
+		} else if (drawer.retrieve('FlowerDrawer_state') == 1) {
+			drawer.store('FlowerDrawer_state',10);
 			drawer.setStyle('display', 'block');
 			stripheight = drawer.getScrollSize().y;
 			drawer.get('tween', {property: 'height',duration: 400}).start(1,stripheight).chain(function(){
 				// set the height back to auto to allow window resize
 				drawer.setStyle('height', 'auto');
-				drawer.store('CUIDrawer_state',11);
+				drawer.store('FlowerDrawer_state',11);
 			}.bind(this));
 		}
 	},
@@ -241,7 +241,7 @@ var CUIDrawer = new Class({
 					drawertarget.setStyle('overflow', 'hidden');
 				}
 				if (altLinkText) {
-					drawertarget.store('CUIDrawer_altText',altLinkText);
+					drawertarget.store('FlowerDrawer_altText',altLinkText);
 				}
 				el.removeEvents('click');
 				el.setStyle('cursor','pointer');
@@ -260,7 +260,7 @@ var CUIDrawer = new Class({
 				if (computedDisplay == 'none') {
 					this.closedrawer(drawertarget);
 				} else {
-					drawertarget.store('CUIDrawer_state',11);
+					drawertarget.store('FlowerDrawer_state',11);
 					if (this.options.closeOnAttach) {
 						this.toggle(drawertarget);
 					}
@@ -269,9 +269,9 @@ var CUIDrawer = new Class({
 					var altText;
 					e.stop();
 					this.toggle(drawertarget);
-					altText = drawertarget.retrieve('CUIDrawer_altText');
+					altText = drawertarget.retrieve('FlowerDrawer_altText');
 					if (altText) {
-						drawertarget.store('CUIDrawer_altText',el.get('html'));
+						drawertarget.store('FlowerDrawer_altText',el.get('html'));
 						el.set('html',altText);
 					}
 					if (hideLink) {
@@ -288,16 +288,16 @@ var CUIDrawer = new Class({
 });
 
 window.addEvent('domready', function(){
-	if (typeof(cashuid) == 'object') {
-		cashuid.registerModule(CUILinkExternal,'linkexternal');
-		cashuid.registerModule(CUILinkPopup,'linkpopup');
-		cashuid.registerModule(CUILinkInside,'linkinside');
-		cashuid.registerModule(CUIDrawer,'drawer');
+	if (typeof(flowerUID) == 'object') {
+		flowerUID.registerModule(FlowerLinkExternal,'linkexternal');
+		flowerUID.registerModule(FlowerLinkPopup,'linkpopup');
+		flowerUID.registerModule(FlowerLinkInside,'linkinside');
+		flowerUID.registerModule(FlowerDrawer,'drawer');
 	} else {
-		var linkexternal = new CUILinkExternal(),
-			linkpopup = new CUILinkPopup(),
-			linkinside = new CUILinkInside(),
-			drawer = new CUILinkInside();
+		var linkexternal = new FlowerLinkExternal(),
+			linkpopup = new FlowerLinkPopup(),
+			linkinside = new FlowerLinkInside(),
+			drawer = new FlowerLinkInside();
 		$$('a.external').each(function(a){linkexternal.attachToElement(a);});
 		$$('a.popup').each(function(a){linkpopup.attachToElement(a);});
 		$$('a.cui_linkinside').each(function(a){linkinside.attachToElement(a);});

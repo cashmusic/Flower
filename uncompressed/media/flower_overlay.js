@@ -39,11 +39,11 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 
 */
-var CUIOverlay = new Class({
+var FlowerOverlay = new Class({
 	/*
-	Class CUIOverlay
+	Class FlowerOverlay
 	
-	CUI Overlay provides a standard DOM base for lightbox-type scripts. 
+	Flower Overlay provides a standard DOM base for lightbox-type scripts. 
 	Intended to be extended	by child classes with added functionality.
 	
 	
@@ -306,5 +306,5 @@ var CUIOverlay = new Class({
 	}
 });
 window.addEvent('domready', function(){
-	if (typeof(cashuid) == 'object') {cashuid.registerModule(CUIOverlay,'overlay');}
+	if (typeof(flowerUID) == 'object') {flowerUID.registerModule(FlowerOverlay,'overlay');}
 });

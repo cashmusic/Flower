@@ -1,8 +1,8 @@
 /*	
 
-cui_core.js v1.0
+flower_core.js v1.0
 
-CASH UI Tools core class
+Flower core class
 more information/downloads available at: http://uitools.cashmusic.org
 
 revisions:
@@ -39,9 +39,9 @@ POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-var CUIDebug = new Class({
+var FlowerDebug = new Class({
 	/*
-	Class CUIDebug
+	Class FlowerDebug
 	
 	Adds additional debug functionality to existing classes.
 		
@@ -49,11 +49,11 @@ var CUIDebug = new Class({
 	debug: 0,
 	cuiCore: false,
 	
-	setCUICore: function(cuiObj) {
+	setFlowerCore: function(cuiObj) {
 		/*
-		Function setCUICore(object cuiObj)
+		Function setFlowerCore(object cuiObj)
 		
-		Sets a pointer to the main CUI Core object
+		Sets a pointer to the main Flower Core object
 		
 		*/
 		this.cuiCore = cuiObj;
@@ -66,14 +66,14 @@ var CUIDebug = new Class({
 				msgTypes;
 			type = type + 0;
 			if (this.cuiCore && this.name) {moduleName = '[' + this.name + '] ';}
-			msgTypes = ['CUI Error: ','CUI Warning: ','CUI Notice: '];
+			msgTypes = ['Flower Error: ','Flower Warning: ','Flower Notice: '];
 			console.log(msgTypes[type] + moduleName + msg);
 		}
 	},
 	
 	debugLoadMsg: function() {
 		if (this.debug) {
-			var logStr = 'CUI Module Loaded: ' + this.name + ' (v' + this.version + ')',
+			var logStr = 'Flower Module Loaded: ' + this.name + ' (v' + this.version + ')',
 				allOptions = this.listAllOptions();
 			if (allOptions) {logStr += '\nOptions: ' + allOptions;}
 			console.log(logStr);
@@ -109,11 +109,11 @@ var CUIDebug = new Class({
 	}
 });
 
-var CUICore = new Class({
+var FlowerCore = new Class({
 	/*
-	Class CUICore
+	Class FlowerCore
 	
-	The CUI Core is a dynamic application manager capable of loading, managing, and
+	The Flower Core is a dynamic application manager capable of loading, managing, and
 	interacting with multiple objects across multiple external javascript files —
 	even cross domain. Each object, or module, can be defined on-the-fly or as part
 	of the core library, with dependencies and CSS selector conditions to trigger
@@ -129,7 +129,7 @@ var CUICore = new Class({
 	  if true, debug information will be sent to the console
 	  
 	• autoBoot (0)
-	  if true, CUI will scan the page for specified selectors and auto-launch
+	  if true, Flower will scan the page for specified selectors and auto-launch
 	  appropriate modules
 	  
 	• timeout (16)
@@ -162,7 +162,7 @@ var CUICore = new Class({
 	  whose appearance in the DOM trigger the module. if attachToLaunchSelectors
 	  is true, the module should call its attachToElement() method for each
 	  selector. relativePath specifies if the filePath is relative to the current 
-	  CUICore.js file, or if it is fully qualified. 
+	  FlowerCore.js file, or if it is fully qualified. 
 	  
 	• loadModule(string moduleName)
 	  loads a module by name
@@ -190,10 +190,10 @@ var CUICore = new Class({
 	  bootComplete event when finished (successfully or not)
 	
 	*/
-	Implements: [Options, Events, CUIDebug],
+	Implements: [Options, Events, FlowerDebug],
 	
-	name: 'CASH User Interface Tools',
-	version: 0.9,
+	name: 'Flower',
+	version: 1.0,
 	
 	options: {
 		debug: 0,
@@ -204,13 +204,13 @@ var CUICore = new Class({
 	initialize: function(options){
 		this.setOptions(options);
 		this.modules = $H();
-		this.commonCache = $H(); // common memory space for all CUI modules
+		this.commonCache = $H(); // common memory space for all Flower modules
 		this.injectedFiles = [];
 		this.debug = 0;
 		this.timeout = this.options.timeout * 1000;
 		this.documenthead = $$('head')[0];
-		// determine file location as CUI library path
-		if (document.id('cui_core')) {this.libpath = document.id('cui_core').getProperty('src').replace('cui_core.js','');}
+		// determine file location as Flower library path
+		if (document.id('flower_core')) {this.libpath = document.id('flower_core').getProperty('src').replace('flower_core.js','');}
 		this.defineLibrary();
 		if (this.options.autoBoot) {this.bootstrap();}
 		
@@ -218,23 +218,23 @@ var CUICore = new Class({
 			this.debug = 1;
 			var allOptions = this.listAllOptions();
 			if (this.libpath) {
-				console.log('CASH UI Tools (v' + this.version + ') loaded.\nPath: \'' + this.libpath + '\'' + '\nMooTools version: ' + MooTools.version + '\nOptions: ' + allOptions);
+				console.log('Flower (v' + this.version + ') loaded.\nPath: \'' + this.libpath + '\'' + '\nMooTools version: ' + MooTools.version + '\nOptions: ' + allOptions);
 			} else {
-				console.log('CASH UI Tools loaded with errors. Version: ' + this.version + ' Path unknown. Please add id="cui_core" to script declaration' + '\nOptions: ' + allOptions);
+				console.log('Flower loaded with errors. Version: ' + this.version + ' Path unknown. Please add id="flower_core" to script declaration' + '\nOptions: ' + allOptions);
 			}
 		}
 	},
 
-	injectScript: function(scripturl,asCUI) {
+	injectScript: function(scripturl,asFlower) {
 		/*
-		Function injectScript(string scripturl, bool asCUI)
+		Function injectScript(string scripturl, bool asFlower)
 		
-		Injects a <script> element into the DOM head. If asCUI is true then scripturl will
+		Injects a <script> element into the DOM head. If asFlower is true then scripturl will
 		be treated as relative to this.libpath
 		
 		*/
 		var injected;
-		if (asCUI) {scripturl = this.libpath + scripturl;}
+		if (asFlower) {scripturl = this.libpath + scripturl;}
 		if (this.injectedFiles.indexOf(scripturl) == -1) {
 			injected = new Element('script', {
 				'type': 'text/javascript',
@@ -249,7 +249,7 @@ var CUICore = new Class({
 		Function htmlContentChanged(element or string inElement)
 	
 		Treats elements that have new content via javascript as if they had just been 
-		loaded in the DOM — auto-attaching CUI modules, etc. 
+		loaded in the DOM — auto-attaching Flower modules, etc. 
 	
 		*/
 		this.allModulesAutoAttach(inElement);
@@ -262,7 +262,7 @@ var CUICore = new Class({
 			mixed (string dependencies) OR (false), string autoLaunch, bool attachToSelectors,
 			bool relativePath)
 	
-		Store information about CUI modules in this.modules, allowing for loading, auto-
+		Store information about Flower modules in this.modules, allowing for loading, auto-
 		loading of dependencies, and auto-attaching to elements by selector.
 		
 		Dependencies should be comma separated, and dependent scripts *must* include 
@@ -410,11 +410,11 @@ var CUICore = new Class({
 		/*
 		Function moduleCallback(object or string theModule)
 		
-		Call-back function for CUI modules keeps main object aware of status and allows for 
+		Call-back function for Flower modules keeps main object aware of status and allows for 
 		easier direct calls to each object where necessary
 		
 		Call-back expects an object with defined 'name' and 'version' properties, ideally 
-		with cui_prototypes implemented. 
+		with flower_prototypes implemented. 
 		
 		*/
 		if (typeof(theModule) == 'object') {
@@ -486,11 +486,11 @@ var CUICore = new Class({
 		Function registerModule(class classType, string className)
 		
 		Called from the module's script file, this function provides a single-line method
-		of implementing CUI classes into the module class, checking for and setting options,
+		of implementing Flower classes into the module class, checking for and setting options,
 		and initiating the module call-back script.
 		
 		*/
-		ClassType.implement(new CUIDebug());
+		ClassType.implement(new FlowerDebug());
 		var optionsCheck = this.getModuleOptions(className),
 			moduleObject;
 		if (optionsCheck) {
@@ -498,7 +498,7 @@ var CUICore = new Class({
 		} else {
 			moduleObject = new ClassType();
 		}
-		moduleObject.setCUICore(this);
+		moduleObject.setFlowerCore(this);
 		this.moduleCallback(moduleObject);	
 	},
 	
@@ -581,14 +581,14 @@ var CUICore = new Class({
 										bool relativePath)
 		
 		*/		
-		this.storeModule('enhancements/cui_anchor.js','linkexternal',0,'a.external',1,1);
-		this.storeModule('enhancements/cui_anchor.js','linkpopup',0,'a.popup',1,1);
-		this.storeModule('enhancements/cui_anchor.js','linkinside',0,'a.cui_linkinside',1,1);
-		this.storeModule('enhancements/cui_anchor.js','drawer',0,'a.cui_drawertoggle',1,1);
-		this.storeModule('utility/cui_utility.js','utility',0,0,0,1);
-		this.storeModule('media/cui_overlay.js','overlay',0,0,0,1);
-		this.storeModule('media/cui_imagebox.js','imagebox','utility,overlay','a.cui_imagebox,div.cui_imagebox',1,1);
-		this.storeModule('media/cui_moviebox.js','moviebox','utility,overlay','a[href$=.mov],a[href$=.mp4],a[href$=.MOV],a[href$=.MP4],a[href^=http://www.youtube.com/watch?v],a[href^=http://youtube.com/watch?v],a[href^=http://vimeo.com/],a[href^=http://www.vimeo.com/],a[href^=http://video.google.com/videoplay?docid],a[href^=http://myspacetv.com/index.cfm?fuseaction=vids.individual&videoid],a[href^=http://vids.myspace.com/index.cfm?fuseaction=vids.individual&videoid]',1,1);
+		this.storeModule('enhancements/flower_anchor.js','linkexternal',0,'a.external',1,1);
+		this.storeModule('enhancements/flower_anchor.js','linkpopup',0,'a.popup',1,1);
+		this.storeModule('enhancements/flower_anchor.js','linkinside',0,'a.flower_linkinside',1,1);
+		this.storeModule('enhancements/flower_anchor.js','drawer',0,'a.flower_drawertoggle',1,1);
+		this.storeModule('utility/flower_utility.js','utility',0,0,0,1);
+		this.storeModule('media/flower_overlay.js','overlay',0,0,0,1);
+		this.storeModule('media/flower_imagebox.js','imagebox','utility,overlay','a.flower_imagebox,div.flower_imagebox',1,1);
+		this.storeModule('media/flower_moviebox.js','moviebox','utility,overlay','a[href$=.mov],a[href$=.mp4],a[href$=.MOV],a[href$=.MP4],a[href^=http://www.youtube.com/watch?v],a[href^=http://youtube.com/watch?v],a[href^=http://vimeo.com/],a[href^=http://www.vimeo.com/],a[href^=http://video.google.com/videoplay?docid],a[href^=http://myspacetv.com/index.cfm?fuseaction=vids.individual&videoid],a[href^=http://vids.myspace.com/index.cfm?fuseaction=vids.individual&videoid]',1,1);
 	},
 	
 	clearAutoLoad: function(moduleName) {

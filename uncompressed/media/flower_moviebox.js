@@ -42,7 +42,7 @@ revisions:
 	    added mobile check/override
 	    added 'esc' to close keybinding
 	    improved documentation/comments
-	    renamed to "CUIMoviebox"
+	    renamed to "FlowerMoviebox"
 
 
 distributed under the BSD license, terms:
@@ -73,14 +73,14 @@ POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-var CUIMoviebox = new Class({
+var FlowerMoviebox = new Class({
 	/*
-	Class CUIMoviebox
+	Class FlowerMoviebox
 	
-	CUI Moviebox displays Quicktime and some video-sharing site embedded Flash in
+	Flower Moviebox displays Quicktime and some video-sharing site embedded Flash in
 	an overlay box. It supports .mov/.mp4 movie files, or content from youtube, 
 	myspace tv, google video, or vimeo.com. Intended to be auto-initiated with 
-	links pointing to supported content, the CUI Moviebox script should be a low-
+	links pointing to supported content, the Flower Moviebox script should be a low-
 	maintenance addition to a page.
 	
 	
@@ -135,7 +135,7 @@ var CUIMoviebox = new Class({
 	• .cui_overlaycontrollink
 	
 	*/
-	Extends: CUIOverlay,
+	Extends: FlowerOverlay,
 	Implements: Options,
 
 	options: {
@@ -148,9 +148,9 @@ var CUIMoviebox = new Class({
 		this.name = 'moviebox';
 		this.version = 1.2;
 		this.donotdebugoptions = false;
-		// utility object pointer below. change from cashuid.getModule if using moviebox and
+		// utility object pointer below. change from flowerUID.getModule if using moviebox and
 		// utility as standalone scripts
-		this.cui_utility = cashuid.getModule('utility');
+		this.cui_utility = flowerUID.getModule('utility');
 		// set global state of moviebox (0 = uninitiated, 1 = hidden, 11 = visible)
 		this.state = 0;
 		this.setOptions(options);
@@ -371,10 +371,10 @@ var CUIMoviebox = new Class({
 	}
 });
 window.addEvent('domready', function(){
-	if (typeof(cashuid) == 'object') {
-		cashuid.registerModule(CUIMoviebox,'moviebox');
+	if (typeof(flowerUID) == 'object') {
+		flowerUID.registerModule(FlowerMoviebox,'moviebox');
 	} else {
-		var moviebox = new CUIMoviebox();
+		var moviebox = new FlowerMoviebox();
 		// auto-attach to movie links
 		$$('a[href$=.mov],a[href$=.mp4],a[href$=.MOV],a[href$=.MP4],a[href^=http://www.youtube.com/watch?v],a[href^=http://youtube.com/watch?v],a[href^=http://vimeo.com/],a[href^=http://www.vimeo.com/],a[href^=http://video.google.com/videoplay?docid],a[href^=http://www.youtube.com/watch?v],a[href^=http://myspacetv.com/index.cfm?fuseaction=vids.individual&videoid],a[href^=http://vids.myspace.com/index.cfm?fuseaction=vids.individual&videoid]').each(function(element){
 			moviebox.attachToElement(element);

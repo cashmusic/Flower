@@ -36,11 +36,11 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 
 */
-var CUIUtility = new Class({
+var FlowerUtility = new Class({
 	/*
-	Class CUIUtility
+	Class FlowerUtility
 	
-	CUI Utility provides measurement, detection, and conversion utilities. 
+	Flower Utility provides measurement, detection, and conversion utilities. 
 	It also stores basic document and media information for repeat access, 
 	and enables the use of a document.fontResize method.
 
@@ -266,5 +266,5 @@ var CUIUtility = new Class({
 	}
 });
 window.addEvent('domready', function(){
-	if (typeof(cashuid) == 'object') {cashuid.registerModule(CUIUtility,'utility');}
+	if (typeof(flowerUID) == 'object') {flowerUID.registerModule(FlowerUtility,'utility');}
 });
