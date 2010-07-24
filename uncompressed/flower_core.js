@@ -47,17 +47,24 @@ var FlowerDebug = new Class({
 		
 	*/
 	debug: 0,
-	cuiCore: false,
+	flowerCore: false,
 	
-	setFlowerCore: function(cuiObj) {
+	setFlowerCore: function(flowerObj) {
 		/*
-		Function setFlowerCore(object cuiObj)
+		Function setFlowerCore(object flowerObj)
 		
 		Sets a pointer to the main Flower Core object
 		
 		*/
-		this.cuiCore = cuiObj;
-		this.debug = this.cuiCore.debug;
+		this.flowerCore = flowerObj;
+		this.debug = this.flowerCore.debug;
+		
+		// check for console
+
+		if(typeof(console) != 'object') var console = {};
+		if(!console.log) console.log = function(){};
+		if(!console.warn) console.warn = console.log;
+		if(!console.error) console.error = console.warn;
 	},
 	
 	debugMsg: function(type,msg) {
@@ -65,9 +72,18 @@ var FlowerDebug = new Class({
 			var moduleName = '',
 				msgTypes;
 			type = type + 0;
-			if (this.cuiCore && this.name) {moduleName = '[' + this.name + '] ';}
+			if (this.flowerCore && this.name) {moduleName = '[' + this.name + '] ';}
 			msgTypes = ['Flower Error: ','Flower Warning: ','Flower Notice: '];
-			console.log(msgTypes[type] + moduleName + msg);
+			switch(type) {
+			case 0:
+				console.error(msgTypes[type] + moduleName + msg);
+			  break;
+			case 1:
+				console.warn(msgTypes[type] + moduleName + msg);
+			  break;
+			default:
+				console.log(msgTypes[type] + moduleName + msg);
+			}
 		}
 	},
 	
@@ -75,8 +91,8 @@ var FlowerDebug = new Class({
 		if (this.debug) {
 			var logStr = 'Flower Module Loaded: ' + this.name + ' (v' + this.version + ')',
 				allOptions = this.listAllOptions();
-			if (allOptions) {logStr += '\nOptions: ' + allOptions;}
-			console.log(logStr);
+			if (allOptions) {logStr += '\n\tOptions:\n\t' + allOptions;}
+			console.log(logStr.replace(/, /g,'\n\t'));
 		}
 	},
 	
@@ -132,9 +148,9 @@ var FlowerCore = new Class({
 	  if true, Flower will scan the page for specified selectors and auto-launch
 	  appropriate modules
 	  
-	• timeout (16)
-	  the number of seconds a module is permitted to load before it is declared
-	  not loade (by error)
+	• timeout (500)
+	  the number of ms a module is permitted to load before it is declared not 
+	  loaded (by error)
 
 	EVENTS:
 	• moduleLoad (string moduleName)
@@ -198,7 +214,7 @@ var FlowerCore = new Class({
 	options: {
 		debug: 0,
 		autoBoot: 0,
-		timeout: 16
+		timeout: 500
 	},
 	
 	initialize: function(options){
@@ -207,7 +223,7 @@ var FlowerCore = new Class({
 		this.commonCache = $H(); // common memory space for all Flower modules
 		this.injectedFiles = [];
 		this.debug = 0;
-		this.timeout = this.options.timeout * 1000;
+		this.timeout = this.options.timeout;
 		this.documenthead = $$('head')[0];
 		// determine file location as Flower library path
 		if (document.id('flower_core')) {this.libpath = document.id('flower_core').getProperty('src').replace('flower_core.js','');}
@@ -218,9 +234,9 @@ var FlowerCore = new Class({
 			this.debug = 1;
 			var allOptions = this.listAllOptions();
 			if (this.libpath) {
-				console.log('Flower (v' + this.version + ') loaded.\nPath: \'' + this.libpath + '\'' + '\nMooTools version: ' + MooTools.version + '\nOptions: ' + allOptions);
+				console.log('Flower (v' + this.version + ') loaded.\n\tPath: \'' + this.libpath + '\'' + '\n\tMooTools version: ' + MooTools.version + '\n\tOptions: ' + allOptions);
 			} else {
-				console.log('Flower loaded with errors. Version: ' + this.version + ' Path unknown. Please add id="flower_core" to script declaration' + '\nOptions: ' + allOptions);
+				console.log('Flower loaded with errors. Version: ' + this.version + ' Path unknown. Please add id="flower_core" to script declaration' + '\n\tOptions: ' + allOptions);
 			}
 		}
 	},
@@ -481,7 +497,7 @@ var FlowerCore = new Class({
 		}.bind(this));
 	},
 	
-	registerModule: function(ClassType,className) {
+	registerModule: function(ClassType,className,delay) {
 		/*
 		Function registerModule(class classType, string className)
 		
@@ -499,7 +515,11 @@ var FlowerCore = new Class({
 			moduleObject = new ClassType();
 		}
 		moduleObject.setFlowerCore(this);
-		this.moduleCallback(moduleObject);	
+		if (delay == true) {
+			return moduleObject;
+		} else {
+			this.moduleCallback(moduleObject);
+		}
 	},
 	
 	bootstrap: function() {
@@ -522,8 +542,8 @@ var FlowerCore = new Class({
 			}
 		}.bind(this));
 		if (bootingModules.length > 0) {
-			this.debugMsg(2,'boot started, attempting to load necessary modules (' +
-				bootingModules.join(', ') + ')');
+			this.debugMsg(2,'boot started, attempting to load necessary modules:' +
+				bootingModules.join('\n\t'));
 		}
 		this.checkBootStatus(bootingModules,0);
 	},
@@ -589,6 +609,7 @@ var FlowerCore = new Class({
 		this.storeModule('media/flower_overlay.js','overlay',0,0,0,1);
 		this.storeModule('media/flower_imagebox.js','imagebox','utility,overlay','a.flower_imagebox,div.flower_imagebox',1,1);
 		this.storeModule('media/flower_moviebox.js','moviebox','utility,overlay','a[href$=.mov],a[href$=.mp4],a[href$=.MOV],a[href$=.MP4],a[href^=http://www.youtube.com/watch?v],a[href^=http://youtube.com/watch?v],a[href^=http://vimeo.com/],a[href^=http://www.vimeo.com/],a[href^=http://video.google.com/videoplay?docid],a[href^=http://myspacetv.com/index.cfm?fuseaction=vids.individual&videoid],a[href^=http://vids.myspace.com/index.cfm?fuseaction=vids.individual&videoid]',1,1);
+		this.storeModule('soundplayer/flower_soundplayer.js','soundplayer',0,'*.flower_soundplayer',1,1);
 	},
 	
 	clearAutoLoad: function(moduleName) {

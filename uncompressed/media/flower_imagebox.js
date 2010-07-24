@@ -637,7 +637,7 @@ window.addEvent('domready', function(){
 	} else {
 		var imagebox = new FlowerImagebox();
 		// auto-attach to .cui_imagebox links and .cui_imagebox div links
-		$$('a.cui_imagebox,div.cui_imagebox').each(function(element){
+		$$('a.flower_imagebox,div.flower_imagebox').each(function(element){
 			imagebox.attachToElement(element);
 		});
 	}

@@ -1,4 +1,4 @@
-var SoundPlayer = new Class({
+var FlowerSoundPlayer = new Class({
 
 /*
 *
@@ -32,6 +32,9 @@ var SoundPlayer = new Class({
 
 	initialize: function(options) {
 		this.setOptions(options);
+		this.name = 'soundplayer';
+		this.version = 1.0;
+		this.donotdebugoptions = false;
 		this.sm2Loaded = false;
 		this.currentSound = null;
 		this.currentPlaylist = null;
@@ -79,13 +82,118 @@ var SoundPlayer = new Class({
 		soundManager.onready(function() {
 			if (soundManager.supported()) {
 				this.soundManager = soundManager;
-				this.onFlashLoaded();
+				this.onSM2Loaded();
 		  } else {
 				this.onError('soundmanager2 loaded but is not supported');
 		  }
 		}.bind(this));
 		soundManager.beginDelayedInit(); // start SM2 init.
 	},
+	
+	
+	
+	
+	/*
+	*
+	*
+	*
+	*
+	Taken directly from imagebox
+	*
+	*
+	*
+	*
+	*/
+	
+	attachToElement: function(el) {
+		/*
+		Function attachToElement(anchor element el)
+	
+		Scans an anchor for links to images. If found, the function removes any 
+		existing click events and adds one to show the linked image
+		
+		*/
+		if (!this.ismobile) {
+			if (el.get('tag') == 'a') {
+				this.addFromLink(el,'default');
+			} else if (el.get('tag') == 'div') {
+				var divCollection = 'default',
+					elid = el.get('id');
+				if (elid) {divCollection = elid;}
+				el.getElements('a').each(function(a){	
+					var elLink = a.getProperty('href');	
+					//
+					//
+					// check for flash/html5, for flash allow:
+					if (theHTML5TestThing == true) {
+						if (elLink.toLowerCase().contains('.mp3') || 
+							elLink.toLowerCase().contains('.ogg') || 
+							elLink.toLowerCase().contains('.wav') || 
+							elLink.toLowerCase().contains('.aif')) 
+						{
+							this.addFromLink(a,divCollection);
+						}
+					} else {
+						if (elLink.toLowerCase().contains('.mp3') || 
+							elLink.toLowerCase().contains('.aac')) 
+						{
+							this.addFromLink(a,divCollection);
+						}
+					}
+				}.bind(this));
+			}
+		}
+	},
+	
+	addFromLink: function(el,collectionName) {
+		/*
+		Function attachToElement(anchor element el, string forCollection)
+	
+		Parses an anchor for a linked image. If found, it adds the image to the 
+		specified collection.
+		
+		*/
+		el.removeEvents('click');
+		var elLink = el.getProperty('href'),
+			elTitle = el.getProperty('title'),
+			linkrev = el.getProperty('rev'),
+			imgWidth = 0,
+			imgHeight = 0,
+			alt = 'featured imgage',
+			splitArgument,
+			collectionPlace;
+		if (linkrev) {
+			if (linkrev.contains('imagebox:')) {
+				$A(linkrev.substring(9,linkrev.length).split(',')).each(function(argument) {
+					splitArgument = argument.split('=');
+					if (splitArgument[0] == 'width') {
+						imgWidth = splitArgument[1];
+					} else if (splitArgument[0] == 'height') {
+						imgHeight = splitArgument[1];
+					} else if (splitArgument[0] == 'alt') {
+						alt = splitArgument[1];
+					} else if (splitArgument[0] == 'collection') {
+						collectionName = splitArgument[1];
+					}
+				}.bind(this));
+			}
+		}
+		// check for existing collection, create a new one if necessary
+		if (!this.collections.get(collectionName)) {this.newCollection(collectionName);}
+		collectionPlace = this.collections.get(collectionName).length;
+		this.addToCollection(collectionName,elLink,elTitle,alt,imgWidth,imgHeight);
+		el.addEvent('click', function(e){
+			this.showImage(collectionName,collectionPlace);
+			e.stop();
+		}.bind(this));
+	},
+	
+	
+	
+	
+	
+	
+	
 	
 	debugMessage: function(msg) {
 		// a simple way to dump to the console when testing should expand to include
@@ -218,7 +326,7 @@ var SoundPlayer = new Class({
 	* event handler functions:
 	*
 	*
-	* onFlashLoaded()
+	* onSM2Loaded()
 	*
 	* onError(string errorType, string errorMessage)
 	*
@@ -229,7 +337,7 @@ var SoundPlayer = new Class({
 	*
 	*/
 
-	onFlashLoaded: function() {
+	onSM2Loaded: function() {
 		if (!this.isReady) {
 			this.sm2Loaded = true;
 			this.soundManager.defaultOptions.volume = this.options.volume;
@@ -505,11 +613,11 @@ var SoundPlayerUI = new Class({
 
 });
 
-var _defaultSoundPlayerUI = new Class({ 
+var defaultSoundPlayerUI = new Class({ 
 
 /*
 *
-* _defaultSoundPlayerUI class:
+* defaultSoundPlayerUI class:
 *
 *
 */
@@ -833,4 +941,21 @@ var _defaultSoundPlayerUI = new Class({
 		}
 	}
 
+});
+window.addEvent('domready', function(){
+	if (typeof(flowerUID) == 'object') {
+		// point the SM2 paths relative to the Flower core:
+		flowerUID.setModuleOptions('soundplayer',{
+			sm2Location: flowerUID.libpath + 'soundplayer/lib/soundmanager2/soundmanager2.js',
+			sm2swfLocation: flowerUID.libpath + 'soundplayer/lib/soundmanager2/swf/'
+		});
+		// register with a delayed call-back:
+		var player = flowerUID.registerModule(FlowerSoundPlayer,'soundplayer',true);
+		// finish the call-back after the player reports itself ready:
+		player.addEvent('ready', function() {
+			flowerUID.moduleCallback(player);
+		});
+	} else {
+		// no auto-launch for standalone
+	}
 });
