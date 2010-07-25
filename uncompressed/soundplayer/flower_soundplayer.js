@@ -117,81 +117,31 @@ var FlowerSoundPlayer = new Class({
 			if (el.get('tag') == 'a') {
 				this.addFromLink(el,'default');
 			} else if (el.get('tag') == 'div') {
-				var divCollection = 'default',
-					elid = el.get('id');
-				if (elid) {divCollection = elid;}
+				var elId = el.get('id'),
+					playlist = [],
+					playlistName,
+					playerUI;
+				if (elId) {
+					playlistName = elId;
+				} else {
+					playlistName = $random(10000,99999);
+				}
 				el.getElements('a').each(function(a){	
-					var elLink = a.getProperty('href');	
-					//
-					//
-					// check for flash/html5, for flash allow:
-					if (theHTML5TestThing == true) {
-						if (elLink.toLowerCase().contains('.mp3') || 
-							elLink.toLowerCase().contains('.ogg') || 
-							elLink.toLowerCase().contains('.wav') || 
-							elLink.toLowerCase().contains('.aif')) 
-						{
-							this.addFromLink(a,divCollection);
-						}
-					} else {
-						if (elLink.toLowerCase().contains('.mp3') || 
-							elLink.toLowerCase().contains('.aac')) 
-						{
-							this.addFromLink(a,divCollection);
-						}
+					var elLink = a.getProperty('href'),
+						elTitle = a.getProperty('title');
+					if (this.soundManager.canPlayURL(elLink)) {
+						playlist.push({url:elLink,title:elTitle,artist:'Unknown'});
 					}
 				}.bind(this));
+				if (playlist.length > 0) {
+					document.id(elId).set('html','');
+					this.loadPlaylist(playlistName, playlist);
+					playerUI = new defaultSoundPlayerUI(this.currentPlaylist,elId);
+					playerUI.drawUI();
+				}
 			}
 		}
 	},
-	
-	addFromLink: function(el,collectionName) {
-		/*
-		Function attachToElement(anchor element el, string forCollection)
-	
-		Parses an anchor for a linked image. If found, it adds the image to the 
-		specified collection.
-		
-		*/
-		el.removeEvents('click');
-		var elLink = el.getProperty('href'),
-			elTitle = el.getProperty('title'),
-			linkrev = el.getProperty('rev'),
-			imgWidth = 0,
-			imgHeight = 0,
-			alt = 'featured imgage',
-			splitArgument,
-			collectionPlace;
-		if (linkrev) {
-			if (linkrev.contains('imagebox:')) {
-				$A(linkrev.substring(9,linkrev.length).split(',')).each(function(argument) {
-					splitArgument = argument.split('=');
-					if (splitArgument[0] == 'width') {
-						imgWidth = splitArgument[1];
-					} else if (splitArgument[0] == 'height') {
-						imgHeight = splitArgument[1];
-					} else if (splitArgument[0] == 'alt') {
-						alt = splitArgument[1];
-					} else if (splitArgument[0] == 'collection') {
-						collectionName = splitArgument[1];
-					}
-				}.bind(this));
-			}
-		}
-		// check for existing collection, create a new one if necessary
-		if (!this.collections.get(collectionName)) {this.newCollection(collectionName);}
-		collectionPlace = this.collections.get(collectionName).length;
-		this.addToCollection(collectionName,elLink,elTitle,alt,imgWidth,imgHeight);
-		el.addEvent('click', function(e){
-			this.showImage(collectionName,collectionPlace);
-			e.stop();
-		}.bind(this));
-	},
-	
-	
-	
-	
-	
 	
 	
 	
@@ -627,19 +577,35 @@ var defaultSoundPlayerUI = new Class({
 	options: {
 		debug: false,
 		forceAppleiDevice: false,
-		controlImages: {
-			// an object specifying URLs for the default control buttons
-			'previous': '/assets/images/previous.png',
-			'next': '/assets/images/next.png',
-			'play': '/assets/images/play.png',
-			'pause': '/assets/images/pause.png'
-		},
-		customElementStyles: null //placeholder — identical Hash to below, applied a second time for user customization of existing styles
+		assetPath: '',
+		controlImages: false,
+			/* an object specifying URLs for the default control buttons
+			*  Example:
+			*  {
+			*    'previous': '/assets/images/previous.png',
+			*    'next': '/assets/images/next.png',
+			*    'play': '/assets/images/play.png',
+			*    'pause': '/assets/images/pause.png'
+			*  }
+			*/
+		customElementStyles: false 
+			//placeholder — identical Hash to below, applied a second time for user customization of existing styles
 	},
 	
 	initialize: function(playlist,targetElement,options) {
 		this.parent(playlist,targetElement,options);
 		this.setOptions(options);
+		if (this.options.controlImages !== false) {
+			this.controlImages = this.options.controlImages;
+		} else {
+			var scriptLocation = this.playlist.SoundPlayer.options.sm2swfLocation.replace('/lib/soundmanager2/swf/','');
+			this.controlImages = {
+				'previous': scriptLocation + '/assets/defaultSoundPlayerUI/images/previous.png',
+				'next': scriptLocation + '/assets/defaultSoundPlayerUI/images/next.png',
+				'play': scriptLocation + '/assets/defaultSoundPlayerUI/images/play.png',
+				'pause': scriptLocation + '/assets/defaultSoundPlayerUI/images/pause.png'
+			};
+		}
 		if (this.options.forceAppleiDevice) {
 			this.isAppleiDevice = true;
 		}
@@ -656,9 +622,9 @@ var defaultSoundPlayerUI = new Class({
 		// controlsStyle - the div containing control buttons
 		//
 		this.elementStyles = new Hash({
-			'seekbarSpc': {'position':'relative','background-color':'#000','height':'9px','width':'100%','margin-top':'4px','overflow':'hidden'},
-			'seekbar': {'position':'absolute','background-color':'#00acf1','height':'9px','width':'0%','cursor':'pointer','z-index':'10'},
-			'position': {'position':'absolute','left':'0%','width':'3px','height':'9px','background-color':'#fff402','z-index':'15'},
+			'seekbarSpc': {'position':'relative','background-color':'#666','height':'9px','width':'100%','margin-top':'4px','overflow':'hidden'},
+			'seekbar': {'position':'absolute','background-color':'#c00','height':'9px','width':'0%','cursor':'pointer','z-index':'10'},
+			'position': {'position':'absolute','left':'0%','width':'3px','height':'9px','background-color':'#000','z-index':'15'},
 			'controls': {'margin-top':'8px','text-align':'right'},
 			'iDeviceLiStyles': {'background':'-webkit-gradient(linear, left top, left bottom, from(#666), to(#222))','color':'#fff'},
 			'iDeviceLiStylesClicked': {'background':'-webkit-gradient(linear, left top, left bottom, from(#00acf1), to(#002939))','color':'#ed028d'},
@@ -804,7 +770,7 @@ var defaultSoundPlayerUI = new Class({
 	
 	addControllerElements: function() {
 		this.playerSpc = new Element('div', {'class': 'flower_soundplayer'});
-		this.soundtitle = new Element('div', {'class':'flower_soundplayer_title','html':'&nbsp;'}).inject(this.playerSpc);
+		this.soundtitle = new Element('div', {'class':'flower_soundplayer_title','html':'Press Play'}).inject(this.playerSpc);
 		this.soundtime = new Element('div', {'class':'flower_soundplayer_time','html':'&nbsp;'}).inject(this.playerSpc);
 		this.seekbarSpc = new Element('div', {
 			'class':'flower_soundplayer_seekbarcontainer',
@@ -827,7 +793,7 @@ var defaultSoundPlayerUI = new Class({
 		// click events are included here because they're the only reason for the elements to exist
 		this.previousEl = new Element('img', {
 			'class':'prev',alt:'prev',id:'prev',
-			src:this.options.controlImages.previous,
+			src:this.controlImages.previous,
 			'styles': this.elementStyles.get('controlImageStyles'),
 			'events': {
 				'click': function(){
@@ -837,7 +803,7 @@ var defaultSoundPlayerUI = new Class({
 		}).inject(this.controls);
 		this.playPauseEl = new Element('img', {
 			'class':'play',alt:'play',id:'play',
-			src:this.options.controlImages.play,
+			src:this.controlImages.play,
 			'styles': this.elementStyles.get('controlImageStyles'),
 			'events': {
 				'click': function(){
@@ -847,7 +813,7 @@ var defaultSoundPlayerUI = new Class({
 		}).inject(this.controls);
 		this.nextEl = new Element('img', {
 			'class':'next',alt:'next',id:'next',
-			src:this.options.controlImages.next,
+			src:this.controlImages.next,
 			'styles': this.elementStyles.get('controlImageStyles'),
 			'events': {
 				'click': function(){
@@ -903,19 +869,19 @@ var defaultSoundPlayerUI = new Class({
 		
 		// add image play/pause state events:
 		this.playlist.SoundPlayer.addEvent('play', function() {
-			this.playPauseEl.set('src',this.options.controlImages.pause);
+			this.playPauseEl.set('src',this.controlImages.pause);
 		}.bind(this));
 
 		this.playlist.SoundPlayer.addEvent('resume', function() {
-			this.playPauseEl.set('src',this.options.controlImages.pause);
+			this.playPauseEl.set('src',this.controlImages.pause);
 		}.bind(this));
 
 		this.playlist.SoundPlayer.addEvent('pause', function() {
-			this.playPauseEl.set('src',this.options.controlImages.play);
+			this.playPauseEl.set('src',this.controlImages.play);
 		}.bind(this));
 
 		this.playlist.SoundPlayer.addEvent('stop', function() {
-			this.playPauseEl.set('src',this.options.controlImages.play);
+			this.playPauseEl.set('src',this.controlImages.play);
 		}.bind(this));
 	},
 	
