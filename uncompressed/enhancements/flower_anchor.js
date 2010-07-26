@@ -1,6 +1,6 @@
 /*	
 
-cui_anchor.js v1.0
+flower_anchor.js v1.0
 
 anchor functionality enhancements
 part of the CASH UI Tools
@@ -60,7 +60,7 @@ var FlowerLinkExternal = new Class({
 		el.addEvent('click', function(e){
 			var extlocation = el.getProperty('href');
 			e.stop();
-			window.open(extlocation,'cui_'+$random(10000,99999)); 
+			window.open(extlocation,'flower_'+$random(10000,99999)); 
 		});
 	}
 });
@@ -96,7 +96,7 @@ var FlowerLinkPopup = new Class({
 		el.addEvent('click', function(e){
 			var poplocation = el.getProperty('href');
 			e.stop();
-			window.open(poplocation,'cui_external'+$random(10000,99999),elOptions); 
+			window.open(poplocation,'flower_external'+$random(10000,99999),elOptions); 
 		}.bind(this));
 	}
 });
@@ -163,8 +163,8 @@ var FlowerLinkInside = new Class({
 				update:reqtarget,
 				data:reqdata,
 				onSuccess: function() {
-					if (this.cuiCore) {
-						this.cuiCore.htmlContentChanged(reqtarget);
+					if (this.flowerCore) {
+						this.flowerCore.htmlContentChanged(reqtarget);
 					}
 				}.bind(this)
 			}).get();
@@ -300,7 +300,7 @@ window.addEvent('domready', function(){
 			drawer = new FlowerLinkInside();
 		$$('a.external').each(function(a){linkexternal.attachToElement(a);});
 		$$('a.popup').each(function(a){linkpopup.attachToElement(a);});
-		$$('a.cui_linkinside').each(function(a){linkinside.attachToElement(a);});
-		$$('a.cui_drawertoggle').each(function(a){drawer.attachToElement(a);});
+		$$('a.flower_linkinside').each(function(a){linkinside.attachToElement(a);});
+		$$('a.flower_drawertoggle').each(function(a){drawer.attachToElement(a);});
 	}
 });
