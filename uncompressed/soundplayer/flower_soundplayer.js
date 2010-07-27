@@ -599,35 +599,19 @@ var defaultSoundPlayerUI = new Class({
 	options: {
 		debug: false,
 		forceAppleiDevice: false,
-		assetPath: '',
-		controlImages: false,
-			/* an object specifying URLs for the default control buttons
-			*  Example:
-			*  {
-			*    'previous': '/assets/images/previous.png',
-			*    'next': '/assets/images/next.png',
-			*    'play': '/assets/images/play.png',
-			*    'pause': '/assets/images/pause.png'
-			*  }
-			*/
-		customElementStyles: false 
-			//placeholder — identical Hash to below, applied a second time for user customization of existing styles
+		assetPath: ''
 	},
 	
 	initialize: function(playlist,targetElement,options) {
 		this.parent(playlist,targetElement,options);
 		this.setOptions(options);
-		if (this.options.controlImages !== false) {
-			this.controlImages = this.options.controlImages;
-		} else {
-			var scriptLocation = this.playlist.SoundPlayer.options.sm2swfLocation.replace('/lib/soundmanager2/swf/','');
-			this.controlImages = {
-				'previous': scriptLocation + '/assets/defaultSoundPlayerUI/images/previous.png',
-				'next': scriptLocation + '/assets/defaultSoundPlayerUI/images/next.png',
-				'play': scriptLocation + '/assets/defaultSoundPlayerUI/images/play.png',
-				'pause': scriptLocation + '/assets/defaultSoundPlayerUI/images/pause.png'
-			};
-		}
+		var scriptLocation = this.playlist.SoundPlayer.options.sm2swfLocation.replace('/lib/soundmanager2/swf/','');
+		this.controlImages = {
+			'previous': scriptLocation + '/assets/defaultSoundPlayerUI/images/previous.png',
+			'next': scriptLocation + '/assets/defaultSoundPlayerUI/images/next.png',
+			'play': scriptLocation + '/assets/defaultSoundPlayerUI/images/play.png',
+			'pause': scriptLocation + '/assets/defaultSoundPlayerUI/images/pause.png'
+		};
 		if (this.options.forceAppleiDevice) {
 			this.isAppleiDevice = true;
 		}
