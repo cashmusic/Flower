@@ -115,7 +115,93 @@ var FlowerSoundPlayer = new Class({
 		*/
 		if (!this.ismobile) {
 			if (el.get('tag') == 'a') {
-				this.addFromLink(el,'default');
+				var elRev = el.getProperty('rev'),
+					elLink = el.getProperty('href');
+				if (this.soundManager.canPlayURL(elLink)) {
+					var playlistName = el.getProperty('html'),
+						elTitle = el.getProperty('title');
+					el.store('isPlaying',false);
+					el.store('prePlayTxt','');
+					el.store('postPlayTxt',' <span class="flower_soundplayer_inlineplaypause">[play]</span>');
+					el.store('prePauseTxt','');
+					el.store('postPauseTxt',' <span class="flower_soundplayer_inlineplaypause">[pause]</span>');
+					el.store('originalHTML',el.get('html'));
+					this.loadPlaylist(playlistName, [{url:elLink,title:elTitle,artist:'Unknown'}]);
+					if (elRev) {
+						el.store('postPlayTxt','');
+						el.store('postPauseTxt','');
+						$A(elRev.substring(12,elRev.length).split(',')).each(function(argument) {
+							var splitArgument = argument.split('=');
+							switch(splitArgument[0]) {
+								case 'playTextBefore':
+									if(splitArgument[1]) {
+										el.store('prePlayTxt',splitArgument[1]);
+									}
+									break;
+								case 'playTextAfter':
+								  	if(splitArgument[1]) {
+										el.store('postPlayTxt',splitArgument[1]);
+									}
+									break;
+								case 'pauseTextBefore':
+									if(splitArgument[1]) {
+										el.store('prePauseTxt',splitArgument[1]);
+									}
+									break;
+								case 'pauseTextAfter':
+									if(splitArgument[1]) {
+										el.store('postPauseTxt',splitArgument[1]);
+									}
+									break;
+							}
+						}.bind(this));
+					}
+				}
+				el.removeEvents('click');
+				el.setStyle('cursor','pointer');
+				el.set('html',el.retrieve('prePlayTxt') + el.retrieve('originalHTML') + el.retrieve('postPlayTxt'));
+				el.addEvent('click', function(e){
+					this.switchPlaylist(playlistName);
+					this.currentPlaylist.toggleCurrentSound();
+					// adding the link display
+					e.stop();
+					if (el.retrieve('isPlaying')) {
+						el.set('html',el.retrieve('prePauseTxt') + el.retrieve('originalHTML') + el.retrieve('postPauseTxt'));
+						el.store('isPlaying',true);
+					} else {
+						el.set('html',el.retrieve('prePlayTxt') + el.retrieve('originalHTML') + el.retrieve('postPlayTxt'));
+						el.store('isPlaying',false);
+					}
+				}.bind(this));
+				
+				// add sound state html changes
+				this.addEvent('play', function() {
+					if (this.currentPlaylist.name == playlistName) {
+						el.set('html',el.retrieve('prePauseTxt') + el.retrieve('originalHTML') + el.retrieve('postPauseTxt'));
+						el.store('isPlaying',true);
+					}
+				}.bind(this));
+
+				this.addEvent('resume', function() {
+					if (this.currentPlaylist.name == playlistName) {
+						el.set('html',el.retrieve('prePauseTxt') + el.retrieve('originalHTML') + el.retrieve('postPauseTxt'));
+						el.store('isPlaying',true);
+					}
+				}.bind(this));
+
+				this.addEvent('pause', function() {
+					if (this.currentPlaylist.name == playlistName) {
+						el.set('html',el.retrieve('prePlayTxt') + el.retrieve('originalHTML') + el.retrieve('postPlayTxt'));
+						el.store('isPlaying',false);
+					}
+				}.bind(this));
+
+				this.addEvent('stop', function() {);
+					if (this.currentPlaylist.name == playlistName) {
+						el.set('html',el.retrieve('prePlayTxt') + el.retrieve('originalHTML') + el.retrieve('postPlayTxt'));
+						el.store('isPlaying',false);
+					}
+				}.bind(this));
 			} else if (el.get('tag') == 'div') {
 				var elId = el.get('id'),
 					playlist = [],
@@ -159,7 +245,7 @@ var FlowerSoundPlayer = new Class({
 	* load functions:
 	*
 	* loadPlaylist(array sounds, object options)
-	* this either loads of queues sounds based on an array of urls or objects
+	* this loads sounds based on an array of urls or objects
 	* (see playlist format)
 	*
 	* loadSound(string/array urlOrArray, object options)
@@ -186,7 +272,7 @@ var FlowerSoundPlayer = new Class({
 	},
 	
 	switchPlaylist: function(toPlaylistName) {
-		if (this.Playlists.get(toPlaylistName) !== null) {
+		if (this.Playlists.get(toPlaylistName) !== null && this.currentPlaylist.name != toPlaylistName) {
 			if (this.currentPlaylist.currentSound) {	
 				this.pauseCurrentSound();
 			}
@@ -374,8 +460,8 @@ var SoundPlaylist = new Class({
 				id: theSound.url, 
 				url: theSound.url,
 				onfinish: function() {
-					this.playSound('next'); 
-					this.SoundPlayer.fireEvent('soundEnd');
+					this.SoundPlayer.fireEvent('stop');
+					this.playSound('next');
 				}.bind(this),
 				whileplaying: function() {
 					if (!this.currentSound.sound.loaded) {
