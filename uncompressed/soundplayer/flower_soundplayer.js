@@ -220,9 +220,9 @@ var FlowerSoundPlayer = new Class({
 					}
 				}.bind(this));
 				if (playlist.length > 0) {
-					document.id(elId).set('html','');
+					document.id(el).set('html','');
 					this.loadPlaylist(playlistName, playlist);
-					playerUI = new defaultSoundPlayerUI(this.currentPlaylist,elId);
+					playerUI = new defaultSoundPlayerUI(this.currentPlaylist,el);
 					playerUI.drawUI();
 				}
 			}
