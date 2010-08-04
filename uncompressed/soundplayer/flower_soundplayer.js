@@ -685,6 +685,9 @@ var defaultSoundPlayerUI = new Class({
 	options: {
 		debug: false,
 		forceAppleiDevice: false,
+		drawController: true,
+		drawPlaylist: true,
+		loadTitle: 'Press Play',
 		assetPath: ''
 	},
 	
@@ -872,7 +875,7 @@ var defaultSoundPlayerUI = new Class({
 	
 	addControllerElements: function() {
 		this.playerSpc = new Element('div', {'class': 'flower_soundplayer'});
-		this.soundtitle = new Element('div', {'class':'flower_soundplayer_title','html':'Press Play'}).inject(this.playerSpc);
+		this.soundtitle = new Element('div', {'class':'flower_soundplayer_title','html':this.options.loadTitle}).inject(this.playerSpc);
 		this.soundtime = new Element('div', {'class':'flower_soundplayer_time','html':'&nbsp;'}).inject(this.playerSpc);
 		this.seekbarSpc = new Element('div', {
 			'class':'flower_soundplayer_seekbarcontainer',
@@ -1021,11 +1024,11 @@ var defaultSoundPlayerUI = new Class({
 	
 	drawUI: function() {
 		if (this.isAppleiDevice) {
-			this.drawPlaylist();
-		} else {
-			this.drawController();
-			this.drawPlaylist();
+			this.options.drawController = false;
+			this.options.drawPlaylist = true;
 		}
+		if (this.options.drawController) {this.drawController();}
+		if (this.options.drawPlaylist) {this.drawPlaylist();}
 	}
 
 });
@@ -1034,7 +1037,8 @@ window.addEvent('domready', function(){
 		// point the SM2 paths relative to the Flower core:
 		flowerUID.setModuleOptions('soundplayer',{
 			sm2Location: flowerUID.libpath + 'soundplayer/lib/soundmanager2/soundmanager2.js',
-			sm2swfLocation: flowerUID.libpath + 'soundplayer/lib/soundmanager2/swf/'
+			sm2swfLocation: flowerUID.libpath + 'soundplayer/lib/soundmanager2/swf/',
+			forceFlash: true
 		});
 		// register with a delayed call-back:
 		var player = flowerUID.registerModule(FlowerSoundPlayer,'soundplayer',true);
