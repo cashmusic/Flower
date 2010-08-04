@@ -44,7 +44,7 @@ var FlowerSoundPlayer = new Class({
 		this.sm2LoadTime = 0;
 		this.isReady = false; // set to true when soundplayer is ready. used as a check — sm2 fires onready 2x on iphone
 		this.isAppleiDevice = false;
-		if ((navigator.userAgent.match(/iPad/i) != null) || (navigator.userAgent.match(/iPhone/i) != null) || (navigator.userAgent.match(/iPod/i) != null)) {
+		if ((navigator.userAgent.match(/iPad/i) !== null) || (navigator.userAgent.match(/iPhone/i) !== null) || (navigator.userAgent.match(/iPod/i) !== null)) {
 			this.isAppleiDevice = true;
 		}
 		window.addEvent('domready', function() {
@@ -139,7 +139,7 @@ var FlowerSoundPlayer = new Class({
 									}
 									break;
 								case 'playTextAfter':
-								  	if(splitArgument[1]) {
+									if(splitArgument[1]) {
 										el.store('postPlayTxt',splitArgument[1]);
 									}
 									break;
@@ -196,7 +196,7 @@ var FlowerSoundPlayer = new Class({
 					}
 				}.bind(this));
 
-				this.addEvent('stop', function() {);
+				this.addEvent('stop', function() {
 					if (this.currentPlaylist.name == playlistName) {
 						el.set('html',el.retrieve('prePlayTxt') + el.retrieve('originalHTML') + el.retrieve('postPlayTxt'));
 						el.store('isPlaying',false);
