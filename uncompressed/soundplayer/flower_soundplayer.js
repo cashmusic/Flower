@@ -213,10 +213,9 @@ var FlowerSoundPlayer = new Class({
 					playlistName = $random(10000,99999);
 				}
 				el.getElements('a').each(function(a){	
-					var elLink = a.getProperty('href'),
-						elTitle = a.getProperty('title');
-					if (this.soundManager.canPlayURL(elLink)) {
-						playlist.push({url:elLink,title:elTitle,artist:'Unknown'});
+					var parsedA = this.parseAforPlaylist(a);
+					if (parsedA) {
+						playlist.push(parsedA);
 					}
 				}.bind(this));
 				if (playlist.length > 0) {
@@ -229,7 +228,70 @@ var FlowerSoundPlayer = new Class({
 		}
 	},
 	
+	parseAforPlaylist: function(a) {
+		var elLink = a.getProperty('href'),
+			elTitle = a.getProperty('title');
+			if (!elTitle) {
+				elTitle = a.getProperty('text');
+			}
+		if (this.soundManager.canPlayURL(elLink)) {
+			return {url:elLink,title:elTitle,artist:'Unknown'};
+		} else {
+			return false;
+		}
+	},
 	
+	createPagePlayer: function(targetEl,listname) {
+		if (document.id(targetEl)) {
+			var playlist = [],
+				playlistName,
+				playerUI;
+			if (listname) {
+				playlistName = listname;
+			} else {
+				playlistName = document.URL;
+			}
+			$$('a[href$=.mp3]','a[href$=.MP3]','a[href$=.ogg]','a[href$=.OGG]','a[href$=.m4a]','a[href$=.M4A]','a[href$=.wav]','a[href$=.WAV]').each(function(a){	
+				var flowerparents = a.getParents('div.flower_soundplayer');
+				if(flowerparents.length == 0 && !a.hasClass('flower_soundplayer')) {
+					var parsedA = this.parseAforPlaylist(a);
+					if (parsedA) {
+						playlist.push(parsedA);
+					}
+				}
+				a.addEvent('click', function(e){
+					this.switchPlaylist(playlistName);
+					var url = a.get('href'),
+						allSoundKeys = this.currentPlaylist.sounds.getKeys(),
+						sound = this.currentPlaylist.sounds.get(url),
+						forcePlay = false;
+					if (this.currentPlaylist.currentSound) {
+						if (this.currentPlaylist.currentSound.sound.playState == 0 && this.currentPlaylist.currentKey == allSoundKeys.indexOf(url)) {
+							forcePlay = true;
+						}
+					}
+					//this.currentPlaylist.toggleCurrentSound();
+					if (this.currentPlaylist.currentKey != allSoundKeys.indexOf(url) || forcePlay) {
+						if (this.currentPlaylist.currentSound) {
+							this.currentPlaylist.currentSound.sound.setPosition(0);
+							this.currentPlaylist.stopCurrentSound();
+						}		
+						this.currentPlaylist.currentKey = allSoundKeys.indexOf(url);
+						this.currentPlaylist.currentSound = sound;
+						this.currentPlaylist.playCurrentSound();
+					} else {
+						this.currentPlaylist.stopCurrentSound();
+					}
+					e.stop();
+				}.bind(this));
+			}.bind(this));
+			if (playlist.length > 0) {
+				this.loadPlaylist(playlistName, playlist);
+				playerUI = new defaultSoundPlayerUI(this.currentPlaylist,document.id(targetEl));
+				playerUI.drawUI();
+			}
+		}
+	},
 	
 	debugMessage: function(msg) {
 		// a simple way to dump to the console when testing should expand to include
