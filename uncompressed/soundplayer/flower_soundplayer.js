@@ -260,29 +260,9 @@ var FlowerSoundPlayer = new Class({
 					}
 				}
 				a.addEvent('click', function(e){
-					this.switchPlaylist(playlistName);
-					var url = a.get('href'),
-						allSoundKeys = this.currentPlaylist.sounds.getKeys(),
-						sound = this.currentPlaylist.sounds.get(url),
-						forcePlay = false;
-					if (this.currentPlaylist.currentSound) {
-						if (this.currentPlaylist.currentSound.sound.playState == 0 && this.currentPlaylist.currentKey == allSoundKeys.indexOf(url)) {
-							forcePlay = true;
-						}
-					}
-					//this.currentPlaylist.toggleCurrentSound();
-					if (this.currentPlaylist.currentKey != allSoundKeys.indexOf(url) || forcePlay) {
-						if (this.currentPlaylist.currentSound) {
-							this.currentPlaylist.currentSound.sound.setPosition(0);
-							this.currentPlaylist.stopCurrentSound();
-						}		
-						this.currentPlaylist.currentKey = allSoundKeys.indexOf(url);
-						this.currentPlaylist.currentSound = sound;
-						this.currentPlaylist.playCurrentSound();
-					} else {
-						this.currentPlaylist.stopCurrentSound();
-					}
 					e.stop();
+					this.switchPlaylist(playlistName);
+					this.currentPlaylist.playOrToggleByURL(a.get('href'));
 				}.bind(this));
 			}.bind(this));
 			if (playlist.length > 0) {
@@ -329,6 +309,7 @@ var FlowerSoundPlayer = new Class({
 			sounds.each(function(sound) {
 				this.currentPlaylist.loadSound(sound);
 			},this);
+			this.currentPlaylist.generateKeyIndex();
 		}
 		return this;
 	},
@@ -482,6 +463,7 @@ var SoundPlaylist = new Class({
 		this.currentKey = -1;
 		this.usingHTML5 = false;
 		this.name = name;
+		this.allSoundKeys = null;
 	},
 	
 	/*
@@ -563,7 +545,14 @@ var SoundPlaylist = new Class({
 		if (this.sounds.get(theSound.url).sound.isHTML5) {
 			this.usingHTML5 = true;
 		}
+		if (!this.currentSound) {
+			this.currentSound = this.sounds.get(theSound.url);
+		}
 		return this;
+	},
+	
+	generateKeyIndex: function() {
+		this.allSoundKeys = this.sounds.getKeys();
 	},
 
 	playSound: function(whichSound) {
@@ -675,6 +664,19 @@ var SoundPlaylist = new Class({
 		}
 	},
 	
+	playOrToggleByURL: function(url) {
+		var sound = this.sounds.get(url);
+		if (this.currentSound != sound) {
+			this.currentSound.sound.setPosition(0);
+			this.stopCurrentSound();
+			this.currentKey = this.allSoundKeys.indexOf(url);
+			this.currentSound = sound;
+			this.playCurrentSound();
+		} else {
+			this.toggleCurrentSound();
+		}
+	},
+	
 	jumpCurrentSoundTo: function(ms) {
 		this.makeCurrent();
 		this.currentSound.sound.setPosition(ms);
@@ -715,7 +717,7 @@ var SoundPlayerUI = new Class({
 			this.targetElement = targetElement;
 			this.playlist = playlist;
 			this.isAppleiDevice = this.playlist.SoundPlayer.isAppleiDevice;
-			this.allSoundKeys = this.playlist.sounds.getKeys();
+			this.allSoundKeys = this.playlist.allSoundKeys;
 		} else {
 			if (this.options.debug) {
 				this.debugMessage('No playlist specified, cannot draw UI.')
@@ -808,25 +810,8 @@ var defaultSoundPlayerUI = new Class({
 
 	handlePlaylistLiClick: function(url) {
 		var sound = this.playlist.sounds.get(url);
-		var forcePlay = false;
-		if (this.playlist.currentSound) {
-			if (this.playlist.currentSound.sound.playState == 0 && this.playlist.currentKey == this.allSoundKeys.indexOf(url)) {
-				forcePlay = true;
-			}
-		}
-		if (this.playlist.currentKey != this.allSoundKeys.indexOf(url) || forcePlay) {
-			if (this.playlist.currentSound) {
-				this.playlist.currentSound.sound.setPosition(0);
-				this.playlist.stopCurrentSound();
-			}		
-			this.playlist.currentKey = this.allSoundKeys.indexOf(url);
-			this.playlist.currentSound = sound;
-			this.playlist.playCurrentSound();
-			this.highlightPlayingLi(url)
-		} else {
-			this.playlist.stopCurrentSound();
-			this.clearAllPlaylistLi();
-		}
+		this.playlist.SoundPlayer.switchPlaylist(this.playlist.name);
+		this.playlist.playOrToggleByURL(track.sound.url);
 	},
 	
 	highlightPlayingLi: function(url) {
@@ -847,9 +832,12 @@ var defaultSoundPlayerUI = new Class({
 	addPlaylistElements: function() {
 		if (!this.isAppleiDevice) {
 			var liCount = 1;
-			this.mainPlaylistUl = new Element('ol',{'styles':{'font-size':'0.85em','padding':0,'margin':0,'list-style-type':'decimal-leading-zero'}});
+			this.mainPlaylistOl = new Element('ol',{
+				'class':'flower_soundplaylist',
+				'styles':{'font-size':'0.85em','padding':0,'margin':0,'list-style-type':'decimal-leading-zero'}
+			});
 			this.playlist.sounds.each(function(track,index) { 
-				var tmpLi = new Element('li',{'styles':{'list-style-position':'inside'}}).inject(this.mainPlaylistUl);
+				var tmpLi = new Element('li',{'styles':{'list-style-position':'inside'}}).inject(this.mainPlaylistOl);
 				if (liCount%2 == 0) {
 					tmpLi.addClass('flower_soundplaylist_altli');
 				}
@@ -860,22 +848,15 @@ var defaultSoundPlayerUI = new Class({
 					'events':{
 						'click': function(){
 							this.playlist.SoundPlayer.switchPlaylist(this.playlist.name);
-							sound = this.playlist.sounds.get(track.sound.url);
-							if (this.playlist.currentSound) {
-								this.playlist.currentSound.sound.setPosition(0);
-								this.playlist.stopCurrentSound();
-							}
-							this.playlist.currentKey = this.allSoundKeys.indexOf(track.sound.url);
-							this.playlist.currentSound = sound;
-							this.playlist.playCurrentSound();
+							this.playlist.playOrToggleByURL(track.sound.url);
 				        }.bind(this)
 					}
 				}).inject(tmpLi);;
 			},this);
 			
-			this.mainPlaylistUl.inject(document.id(this.targetElement));
+			this.mainPlaylistOl.inject(this.playerSpc);
 		} else {
-			this.mainPlaylistUl = new Element('ol',{'styles':{'font-size':'0.85em','padding':0,'margin':0,'list-style-type':'decimal-leading-zero'}});
+			this.mainPlaylistOl = new Element('ol',{'styles':{'font-size':'0.85em','padding':0,'margin':0,'list-style-type':'decimal-leading-zero'}});
 			this.playlist.sounds.each(function(track,index) { 
 				var tmpLi = new Element('li',{'styles':{
 					'list-style-position':'inside',
@@ -888,7 +869,7 @@ var defaultSoundPlayerUI = new Class({
 					'cursor':'pointer',
 					'color':'#fff'
 					}
-				}).inject(this.mainPlaylistUl);
+				}).inject(this.mainPlaylistOl);
 				var tmpTitleSpan = new Element('span',{
 					text:track.title,
 					'styles':{'font-size':'1.5em','line-height':'1em','font-weight':'bold','display':'block'}
@@ -900,7 +881,7 @@ var defaultSoundPlayerUI = new Class({
 				this.allPlaylistLi.set(track.sound.url,new Hash({'li':tmpLi,'titlespan':tmpTitleSpan,'timespan':tmpTimeSpan}));
 			},this);
 			
-			this.mainPlaylistUl.inject(document.id(this.targetElement));
+			this.mainPlaylistOl.inject(this.playerSpc);
 		}
 	},
 	
@@ -923,8 +904,12 @@ var defaultSoundPlayerUI = new Class({
 	},
 	
 	drawPlaylist: function() {
+		var calledAlone = false;
+		if (!this.playerSpc) {calledAlone = true;}
+		if (calledAlone) {this.playerSpc = new Element('div', {'class': 'flower_soundplayer'});}
 		this.addPlaylistElements();
 		this.addPlaylistEvents();
+		if (calledAlone) {this.playerSpc.inject(document.id(this.targetElement));}
 	},
 	
 	//
@@ -936,7 +921,6 @@ var defaultSoundPlayerUI = new Class({
 	// All Controller (seekbar + buttons) functions ->
 	
 	addControllerElements: function() {
-		this.playerSpc = new Element('div', {'class': 'flower_soundplayer'});
 		this.soundtitle = new Element('div', {'class':'flower_soundplayer_title','html':this.options.loadTitle}).inject(this.playerSpc);
 		this.soundtime = new Element('div', {'class':'flower_soundplayer_time','html':'&nbsp;'}).inject(this.playerSpc);
 		this.seekbarSpc = new Element('div', {
@@ -988,8 +972,6 @@ var defaultSoundPlayerUI = new Class({
 		        }.bind(this)
 			}
 		}).inject(this.controls);
-		
-		this.playerSpc.inject(document.id(this.targetElement));
 	},
 	
 	addControllerEvents: function() {
@@ -1072,8 +1054,12 @@ var defaultSoundPlayerUI = new Class({
 	},
 	
 	drawController: function() {
+		var calledAlone = false;
+		if (!this.playerSpc) {calledAlone = true;}
+		if (calledAlone) {this.playerSpc = new Element('div', {'class': 'flower_soundplayer'});}
 		this.addControllerElements();
 		this.addControllerEvents();
+		if (calledAlone) {this.playerSpc.inject(document.id(this.targetElement));}
 	},
 	
 	//
@@ -1085,12 +1071,14 @@ var defaultSoundPlayerUI = new Class({
 	// Final logic to draw the UI
 	
 	drawUI: function() {
+		this.playerSpc = new Element('div', {'class': 'flower_soundplayer'});
 		if (this.isAppleiDevice) {
 			this.options.drawController = false;
 			this.options.drawPlaylist = true;
 		}
 		if (this.options.drawController) {this.drawController();}
 		if (this.options.drawPlaylist) {this.drawPlaylist();}
+		this.playerSpc.inject(document.id(this.targetElement));
 	}
 
 });
