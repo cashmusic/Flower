@@ -95,3 +95,5 @@ ol.li {font-size:0.65em;}
 #soundplayerspc2 div.flower_soundplayer_time {font-size:0.65em;color:#999;}
 #soundplayerspc2 div.flower_soundplayer_title {font-size:1.25em;font-weight:bold;}
 #soundplayerspc2 div.flower_soundplayer_seekbar {background-color:#0cf !important;}
+
+#pagePlayerTarget {position:fixed;background-color:#bbb;bottom:80px;left:0;width:400px;padding:8px;z-index:12345;}
