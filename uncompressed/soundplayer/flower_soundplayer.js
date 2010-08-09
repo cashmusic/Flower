@@ -223,6 +223,7 @@ var FlowerSoundPlayer = new Class({
 					this.loadPlaylist(playlistName, playlist);
 					playerUI = new defaultSoundPlayerUI(this.currentPlaylist,el);
 					playerUI.drawUI();
+					el.setStyle('visibility','visible');
 				}
 			}
 		}
@@ -460,7 +461,7 @@ var SoundPlaylist = new Class({
 		this.SoundPlayer = null;
 		this.sounds = new Hash();	
 		this.currentSound = null;
-		this.currentKey = -1;
+		this.currentKey = 0;
 		this.usingHTML5 = false;
 		this.name = name;
 		this.allSoundKeys = null;
@@ -578,13 +579,10 @@ var SoundPlaylist = new Class({
 				key = this.currentKey + 1;
 			}
 		} else if (whichSound == 'previous') {
-			// check for null, ignore if no sound has been played yet
-			if (this.currentSound != null) {
-				if (this.currentKey == 0) {
-					key = allSoundKeys.length - 1;	
-				} else {
-					key = this.currentKey - 1;
-				}
+			if (this.currentKey == 0) {
+				key = allSoundKeys.length - 1;	
+			} else {
+				key = this.currentKey - 1;
 			}
 		} else if (whichSound == 'random') {	
 			key = Math.floor(Math.random()*allSoundKeys.length);
@@ -787,7 +785,7 @@ var defaultSoundPlayerUI = new Class({
 			'controls': {'margin-top':'8px','text-align':'right'},
 			'iDeviceLiStyles': {'background':'-webkit-gradient(linear, left top, left bottom, from(#666), to(#222))','color':'#fff'},
 			'iDeviceLiStylesClicked': {'background':'-webkit-gradient(linear, left top, left bottom, from(#00acf1), to(#002939))','color':'#ed028d'},
-			'controlImageStyles': {'margin-left':'4px','cursor':'pointer'}
+			'controlImageStyles': {'margin-left':'4px','cursor':'pointer','width':'20px','height':'21px'}
 		});
 	},
 	
@@ -921,12 +919,13 @@ var defaultSoundPlayerUI = new Class({
 	// All Controller (seekbar + buttons) functions ->
 	
 	addControllerElements: function() {
-		this.soundtitle = new Element('div', {'class':'flower_soundplayer_title','html':this.options.loadTitle}).inject(this.playerSpc);
-		this.soundtime = new Element('div', {'class':'flower_soundplayer_time','html':'&nbsp;'}).inject(this.playerSpc);
+		this.controlsSpc = new Element('div',{'class':'flower_soundplayer_ui'}).inject(this.playerSpc);
+		this.soundtitle = new Element('div', {'class':'flower_soundplayer_title','html':this.options.loadTitle}).inject(this.controlsSpc);
+		this.soundtime = new Element('div', {'class':'flower_soundplayer_time','html':'&nbsp;'}).inject(this.controlsSpc);
 		this.seekbarSpc = new Element('div', {
 			'class':'flower_soundplayer_seekbarcontainer',
 			'styles': this.elementStyles.get('seekbarSpc')
-		}).inject(this.playerSpc);
+		}).inject(this.controlsSpc);
 		this.seekbar = new Element('div', {
 			'class':'flower_soundplayer_seekbar',
 			'styles': this.elementStyles.get('seekbar')
@@ -938,12 +937,12 @@ var defaultSoundPlayerUI = new Class({
 		this.controls = new Element('div', {
 			'class':'flower_soundplayer_controls',
 			'styles': this.elementStyles.get('controls')
-		}).inject(this.playerSpc);
+		}).inject(this.controlsSpc);
 		
 		// play/pause/next buttons
 		// click events are included here because they're the only reason for the elements to exist
 		this.previousEl = new Element('img', {
-			'class':'prev',alt:'prev',id:'prev',
+			'class':'flower_soundplayer_prev',alt:'prev',
 			src:this.controlImages.previous,
 			'styles': this.elementStyles.get('controlImageStyles'),
 			'events': {
@@ -953,7 +952,7 @@ var defaultSoundPlayerUI = new Class({
 			}
 		}).inject(this.controls);
 		this.playPauseEl = new Element('img', {
-			'class':'play',alt:'play',id:'play',
+			'class':'play',alt:'play',
 			src:this.controlImages.play,
 			'styles': this.elementStyles.get('controlImageStyles'),
 			'events': {
@@ -963,7 +962,7 @@ var defaultSoundPlayerUI = new Class({
 			}
 		}).inject(this.controls);
 		this.nextEl = new Element('img', {
-			'class':'next',alt:'next',id:'next',
+			'class':'next',alt:'next',
 			src:this.controlImages.next,
 			'styles': this.elementStyles.get('controlImageStyles'),
 			'events': {

@@ -87,13 +87,13 @@ span.notation {font-size:0.85em;line-height:1.25em;color:#999;}
 span.notation a {color:#999;font-weight:normal;border:2px solid transparent;margin-left:-2px;}
 span.notation a:hover {color:#fff;background-color:#999;border:2px solid #999;}
 ol.li {font-size:0.65em;}
-.ifjsdisplaynone {display:none;}
 #soundplayerspc2 {background-color:#333;color:#fff;}
-#soundplayerspc2 div.flower_soundplayer, #soundplayerspc2 li {padding:6px;}
+#soundplayerspc2 div.flower_soundplayer_ui, #soundplayerspc2 li {padding:6px;}
 #soundplayerspc2 li {padding:2px 6px 2px 6px;border-top:1px dotted #666;}
 #soundplayerspc2 li.flower_soundplaylist_altli {background-color:#444;}
 #soundplayerspc2 div.flower_soundplayer_time {font-size:0.65em;color:#999;}
 #soundplayerspc2 div.flower_soundplayer_title {font-size:1.25em;font-weight:bold;}
 #soundplayerspc2 div.flower_soundplayer_seekbar {background-color:#0cf !important;}
 
-#pagePlayerTarget {position:fixed;background-color:#000;color:#fff;bottom:40px;left:0;width:400px;padding:8px;z-index:12345;}
+#pagePlayerTarget {position:fixed;background-color:#000;color:#fff;top:0;left:0;width:400px;height:auto;padding:0 6px 0 6px;z-index:12345;}
+#pagePlayerTarget div.flower_soundplayer {padding-bottom:6px;}

@@ -227,6 +227,15 @@ var FlowerCore = new Class({
 		this.documenthead = $$('head')[0];
 		// determine file location as Flower library path
 		if (document.id('flower_core')) {this.libpath = document.id('flower_core').getProperty('src').replace('flower_core.js','');}
+		
+		// hide/show ifjs_ specials
+		$$('*.ifjs_visibilityhidden','div.flower_soundplayer').each(function(el){el.setStyle('visibility','hidden');});
+		$$('*.ifjs_visibilityvisible').each(function(el){el.setStyle('visibility','visible');});
+		$$('*.ifjs_displaynone').each(function(el){el.setStyle('display','none');});
+		$$('*.ifjs_displayblock').each(function(el){el.setStyle('display','block');});
+		$$('*.ifjs_displayinline').each(function(el){el.setStyle('display','inline');});
+		
+		// define and load up the standard library
 		this.defineLibrary();
 		if (this.options.autoBoot) {this.bootstrap();}
 		

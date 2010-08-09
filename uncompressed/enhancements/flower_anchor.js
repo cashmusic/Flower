@@ -235,7 +235,7 @@ var FlowerDrawer = new Class({
 			}
 			if (drawertarget) {
 				var drawertarget_position = drawertarget.getStyle('position');
-				if (drawertarget_position != 'absolute' || drawertarget_position != 'relative') {
+				if (drawertarget_position != 'absolute' && drawertarget_position != 'relative' && drawertarget_position != 'fixed') {
 					drawertarget.setStyles({'position':'relative','overflow':'hidden'});
 				} else {
 					drawertarget.setStyle('overflow', 'hidden');

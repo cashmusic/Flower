@@ -1,6 +1,6 @@
 /*	
 
-cui_moviebox.js v1.2
+flower_moviebox.js v1.2
 
 a mootools based lightbox-type script for movie links and streaming content
 part of the CASH UI Tools
@@ -11,7 +11,7 @@ and aaron newton (http://clientside.cnet.com/)
 
 requires:
 • mootools v1.2
-• cui_overlay v1.0+
+• flower_overlay v1.0+
 
 revisions:
 • 1.10: fixed PC firefox closing bugs
@@ -33,7 +33,7 @@ revisions:
 
 • 1.2:  reworked for mootools 1.2
 		optimizations
-		split out cui_overlay and cui_utility classes
+		split out flower_overlay and flower_utility classes
 		allows rev-based height/width options for each link
 		added classes to most DOM elements (for CSS customization)
 		added support for vimeo and myspace links
@@ -127,12 +127,12 @@ var FlowerMoviebox = new Class({
 		 integer movHeight)
 	  opens an overlay window showthing the specified movie
 	
-	CSS CLASSES AVAILABLE FOR STYLING (from cui_overlay.js)
-	• .cui_overlay
-	• .cui_overlaycontentspc
-	• .cui_overlaycaptionspc
-	• .cui_overlaycaption
-	• .cui_overlaycontrollink
+	CSS CLASSES AVAILABLE FOR STYLING (from flower_overlay.js)
+	• .flower_overlay
+	• .flower_overlaycontentspc
+	• .flower_overlaycaptionspc
+	• .flower_overlaycaption
+	• .flower_overlaycontrollink
 	
 	*/
 	Extends: FlowerOverlay,
@@ -150,17 +150,17 @@ var FlowerMoviebox = new Class({
 		this.donotdebugoptions = false;
 		// utility object pointer below. change from flowerUID.getModule if using moviebox and
 		// utility as standalone scripts
-		this.cui_utility = flowerUID.getModule('utility');
+		this.flower_utility = flowerUID.getModule('utility');
 		// set global state of moviebox (0 = uninitiated, 1 = hidden, 11 = visible)
 		this.state = 0;
 		this.setOptions(options);
 		this.renderboxheight = this.options.boxheight;
 		this.renderboxwidth = this.options.boxwidth;
 		// plugin/axo detection
-		this.flashDetected = this.cui_utility.detectPluginOrAxo('Flash');
-		this.qtDetected = this.cui_utility.detectPluginOrAxo('QuickTime');
+		this.flashDetected = this.flower_utility.detectPluginOrAxo('Flash');
+		this.qtDetected = this.flower_utility.detectPluginOrAxo('QuickTime');
 		// check for mobile
-		this.ismobile = this.cui_utility.checkForMobile();
+		this.ismobile = this.flower_utility.checkForMobile();
 		this.addKeyEvents();
 	},
 	
@@ -201,14 +201,14 @@ var FlowerMoviebox = new Class({
 				if (this.options.showcontrols == 'true') {elHeight += 16;}
 			} else if (elLinkLc.contains('youtube.com/watch?v=') && this.flashDetected) {
 				elMovieType = 'yt';
-				elHeight = (elWidth*0.75).round()+37;
+				elHeight = (elWidth*0.5625).round()+25;
 			} else if ((elLinkLc.contains('myspacetv.com') || elLinkLc.contains('vids.myspace.com')) &&
 						elLinkLc.contains('vids.individual&videoid=') && this.flashDetected) {
 				elMovieType = 'ms';
-				elHeight = (elWidth*0.75).round()+30;
+				elHeight = (elWidth*0.5625).round()+40;
 			} else if (elLinkLc.contains('video.google.com/videoplay?docid=') && this.flashDetected) {
 				elMovieType = 'gv';
-				elHeight = (elWidth*0.75).round()+26;
+				elHeight = (elWidth*0.5625).round()+26;
 			} else if (elLinkLc.test(/vimeo.com\/\d/) && this.flashDetected) {
 				elMovieType = 'vm';
 			}
@@ -244,32 +244,21 @@ var FlowerMoviebox = new Class({
 		this.showOverlay();
 	},
 	
-	addKeyEvents: function() {
-		/*
-		Function addKeyEvents()
-		
-		Adds a keydown event hiding the overlay when 'esc' is pressed.
-		
-		This will not fire if the movie type is a Flash movie with full-screen enabled
-		as the Flash event listener will take precedence.
-		
-		*/
-		document.addEvent('keydown', function(e){
-			if (this.state == 11 && e.key == 'esc') {
-				this.hideOverlay();
-			}
-		}.bind(this));
-	},
-	
 	showOverlay: function() {
 		/*
 		Function showOverlay()
 		
-		From the parent cui_overlay. Adds a this.state check to ensure the overlay
+		From the parent flower_overlay. Adds a this.state check to ensure the overlay
 		is currently hidden.
 		
 		*/
 		if (this.state == 1) {
+			if (window.flowerUID) {
+				var sp = flowerUID.getModule('soundplayer');
+				if(sp) {
+					sp.pauseCurrentSound();
+				}
+			}
 			this.parent();
 			// set this.state in showContent()
 		}
@@ -279,7 +268,7 @@ var FlowerMoviebox = new Class({
 		/*
 		Function showContent()
 		
-		From the parent cui_overlay. Sets the html of the overlayContentSpc DOM element
+		From the parent flower_overlay. Sets the html of the overlayContentSpc DOM element
 		placing an object tag containing the specified movie. Uses .set('html',x) rather
 		than proper DOM injection due to buggy <object> insertion for QuickTime and as 
 		a way around the click-to-enable-Flash 'feature' of some browsers 
@@ -344,7 +333,7 @@ var FlowerMoviebox = new Class({
 		/*
 		Function hideOverlay()
 		
-		From the parent cui_overlay. Adds a this.state check to ensure the overlay
+		From the parent flower_overlay. Adds a this.state check to ensure the overlay
 		is currently shown and not busy, handles video <object> cleanup.
 		
 		*/

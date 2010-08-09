@@ -1,6 +1,6 @@
 /*	
 
-cui_overlay.js v1.0
+flower_overlay.js v1.0
 
 preps the overlay area for imagebox and moviebox
 part of the CASH UI Tools
@@ -48,11 +48,11 @@ var FlowerOverlay = new Class({
 	
 	
 	CSS CLASSES AVAILABLE FOR STYLING
-	• .cui_overlay
-	• .cui_overlaycontentspc
-	• .cui_overlaycaptionspc
-	• .cui_overlaycaption
-	• .cui_overlaycontrollink
+	• .flower_overlay
+	• .flower_overlaycontentspc
+	• .flower_overlaycaptionspc
+	• .flower_overlaycaption
+	• .flower_overlaycontrollink
 	
 	*/
 	initialize: function(){
@@ -69,8 +69,8 @@ var FlowerOverlay = new Class({
 		linkovercolor: '#ffffff',
 		textcolor: '#cccccc',
 		borderwidth: 5,
-		boxwidth: 480,
-		boxheight: 320,
+		boxwidth: 640,
+		boxheight: 360,
 		zindex: 1234
 	},
 
@@ -82,7 +82,8 @@ var FlowerOverlay = new Class({
 	
 	*/
 		this.overlaySpc = new Element('div', {
-			'styles': {	
+			'class': 'flower_overlay_container',
+			'styles': {
 				'position': (Browser.Engine.trident4) ? 'absolute' : 'fixed',
 				'top': '0px',
 				'left': '0px',
@@ -94,7 +95,7 @@ var FlowerOverlay = new Class({
 			}
 		}).inject(document.body);
 		this.overlay = new Element('div', {
-			'class': 'cui_overlay',
+			'class': 'flower_overlay',
 			'styles': {	
 				'position': 'absolute',
 				'top': '0px',
@@ -107,7 +108,7 @@ var FlowerOverlay = new Class({
 			}
 		}).inject(this.overlaySpc);
 		this.overlayContentSpc = new Element('div', {
-			'class': 'cui_overlaycontentspc',
+			'class': 'flower_overlay_contentcontainer',
 			'styles': {
 				'position': 'absolute',
 				'top': '50%',
@@ -124,7 +125,7 @@ var FlowerOverlay = new Class({
 			}
 		}).inject(this.overlaySpc);
 		this.overlayCaptionSpc = new Element('div', {
-			'class': 'cui_overlaycaptionspc',
+			'class': 'flower_overlay_captioncontainer',
 			'styles': {
 				'position': 'absolute',
 				'top': '50%',
@@ -139,7 +140,7 @@ var FlowerOverlay = new Class({
 			}
 		}).inject(this.overlaySpc);
 		this.overlayCaption = new Element('p', {
-			'class': 'cui_overlaycaption',
+			'class': 'flower_overlay_caption',
 			'styles': {
 				'color': this.options.textcolor,
 				'display': 'none',
@@ -167,6 +168,7 @@ var FlowerOverlay = new Class({
 	
 	*/
 		this.overlayControlSpc = new Element('div', {
+			'class': 'flower_overlay_controls',
 			'styles': {
 				'margin': '5px 0 0 0',
 				'white-space': 'nowrap',
@@ -174,7 +176,7 @@ var FlowerOverlay = new Class({
 			}
 		}).inject(this.overlayCaptionSpc);
 		this.overlayCloseLink = new Element('a', {
-			'class': 'cui_overlaycontrollink',
+			'class': 'flower_overlay_controllink',
 			'styles': {
 				'color': this.options.linkcolor,
 				'margin': '0',
@@ -217,6 +219,23 @@ var FlowerOverlay = new Class({
 	*/
 		this.fxOverlay = new Fx.Tween(this.overlay, {property: 'opacity', fps: 33, duration: 250});
 		this.fxOpenContentSpc = new Fx.Tween(this.overlayContentSpc, {property: 'height', fps: 33, duration: 500});
+	},
+	
+	addKeyEvents: function() {
+		/*
+		Function addKeyEvents()
+		
+		Adds a keydown event hiding the overlay when 'esc' is pressed.
+		
+		This will not fire if the movie type is a Flash movie with full-screen enabled
+		as the Flash event listener will take precedence.
+		
+		*/
+		document.addEvent('keydown', function(e){
+			if (this.state == 11 && e.key == 'esc') {
+				this.hideOverlay();
+			}
+		}.bind(this));
 	},
 	
 	showOverlay: function() {
@@ -294,7 +313,7 @@ var FlowerOverlay = new Class({
 	
 	Simulates position:fixed for the overlaySpc DOM element on IE6.
 	
-	to-do: generalize and add to cui_utility?
+	should we even be supporting IE6?
 	
 	*/
 		this.overlaySpc.setStyles({

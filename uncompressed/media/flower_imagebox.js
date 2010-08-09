@@ -1,6 +1,6 @@
 /*	
 
-cui_imagebox.js v1.2
+flower_imagebox.js v1.2
 
 a mootools based lightbox-type script
 part of the CASH UI Tools
@@ -11,7 +11,7 @@ and aaron newton (http://clientside.cnet.com/)
 
 requires:
 • mootools v 1.2.4
-• cui_overlay v1.0+
+• flower_overlay v1.0+
 
 distributed under the BSD license, terms:
 Copyright (c) 2009, CASH Music
@@ -107,12 +107,12 @@ var FlowerImagebox = new Class({
 	• showImage(string collectionName, integer collectionPlace)
 	  opens an overlay window showing the specified image
 	
-	CSS CLASSES AVAILABLE FOR STYLING (from cui_overlay.js)
-	• .cui_overlay
-	• .cui_overlaycontentspc
-	• .cui_overlaycaptionspc
-	• .cui_overlaycaption
-	• .cui_overlaycontrollink
+	CSS CLASSES AVAILABLE FOR STYLING (from flower_overlay.js)
+	• .flower_overlay
+	• .flower_overlaycontentspc
+	• .flower_overlaycaptionspc
+	• .flower_overlaycaption
+	• .flower_overlaycontrollink
 	
 	*/
 	Extends: FlowerOverlay,
@@ -130,7 +130,7 @@ var FlowerImagebox = new Class({
 		this.name = 'imagebox';
 		this.version = 1.0;
 		this.donotdebugoptions = false;
-		// uses cui_utility module for checkForMobile() call. if using as standalone script
+		// uses flower_utility module for checkForMobile() call. if using as standalone script
 		// simply copy that function into this class for efficiency 
 		this.ismobile = flowerUID.getModule('utility').checkForMobile();
 		// set global state of imagebox (0 = uninitiated, 1 = hidden, 10 = visible/busy, 11 = visible/normal)
@@ -160,15 +160,8 @@ var FlowerImagebox = new Class({
 				var divCollection = 'default',
 					elid = el.get('id');
 				if (elid) {divCollection = elid;}
-				el.getElements('a').each(function(a){	
-					var elLink = a.getProperty('href');	
-					if (elLink.toLowerCase().contains('.jpg') || 
-						elLink.toLowerCase().contains('.jpeg') || 
-						elLink.toLowerCase().contains('.gif') || 
-						elLink.toLowerCase().contains('.png')) 
-					{
-						this.addFromLink(a,divCollection);
-					}
+				el.getElements('a[href*=.jpg],a[href*=.jpeg],a[href*=.gif],a[href*=.png]').each(function(a){	
+					this.addFromLink(a,divCollection);
 				}.bind(this));
 			}
 		}
@@ -241,13 +234,13 @@ var FlowerImagebox = new Class({
 		/*
 		Function addControlElements()
 		
-		From the parent cui_overlay. Extended to add previous and next links
+		From the parent flower_overlay. Extended to add previous and next links
 		
 		*/
 		this.parent();
 		this.overlayCloseLink.set('html','close <small>[esc]</small>');
 		this.overlayPrevLink = new Element('a', {
-			'class': 'cui_overlaycontrollink',
+			'class': 'flower_overlay_controllink',
 			'styles': {
 				'color': this.options.linkcolor,
 				'margin': '0 1.3em 0 0',
@@ -268,7 +261,7 @@ var FlowerImagebox = new Class({
 			}
 		}).inject(this.overlayCloseLink,'before');
 		this.overlayNextLink = new Element('a', {
-			'class': 'cui_overlaycontrollink',
+			'class': 'flower_overlay_controllink',
 			'styles': {
 				'color': this.options.linkcolor,
 				'margin': '0 0 0 1.3em',
@@ -414,7 +407,7 @@ var FlowerImagebox = new Class({
 		
 		*/
 		this.currentImg = new Element('img', {
-			'class': 'FlowerImageboximg',
+			'class': 'flower_imagebox_img',
 			'src': '',
 			'alt': '',
 			'styles': {
@@ -574,7 +567,7 @@ var FlowerImagebox = new Class({
 		/*
 		Function showOverlay()
 		
-		From the parent cui_overlay. Adds a this.state check to ensure the overlay
+		From the parent flower_overlay. Adds a this.state check to ensure the overlay
 		is currently hidden, and deals with previous/next button styles.
 		
 		*/
@@ -593,7 +586,7 @@ var FlowerImagebox = new Class({
 		/*
 		Function showContent()
 		
-		Called from the parent cui_overlay.
+		Called from the parent flower_overlay.
 		
 		*/
 		this.fadeCurrentImage.set(0);
@@ -604,7 +597,7 @@ var FlowerImagebox = new Class({
 		/*
 		Function hideOverlay()
 		
-		From the parent cui_overlay. Adds a this.state check to ensure the overlay
+		From the parent flower_overlay. Adds a this.state check to ensure the overlay
 		is currently shown and not busy, handles image and style cleanup.
 		
 		*/
@@ -636,7 +629,7 @@ window.addEvent('domready', function(){
 		flowerUID.registerModule(FlowerImagebox,'imagebox');
 	} else {
 		var imagebox = new FlowerImagebox();
-		// auto-attach to .cui_imagebox links and .cui_imagebox div links
+		// auto-attach to .flower_imagebox links and .flower_imagebox div links
 		$$('a.flower_imagebox,div.flower_imagebox').each(function(element){
 			imagebox.attachToElement(element);
 		});
