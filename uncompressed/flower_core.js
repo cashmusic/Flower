@@ -618,7 +618,7 @@ var FlowerCore = new Class({
 		this.storeModule('media/flower_overlay.js','overlay',0,0,0,1);
 		this.storeModule('media/flower_imagebox.js','imagebox','utility,overlay','a.flower_imagebox,div.flower_imagebox',1,1);
 		this.storeModule('media/flower_moviebox.js','moviebox','utility,overlay','a[href$=.mov],a[href$=.mp4],a[href$=.MOV],a[href$=.MP4],a[href^=http://www.youtube.com/watch?v],a[href^=http://youtube.com/watch?v],a[href^=http://vimeo.com/],a[href^=http://www.vimeo.com/],a[href^=http://video.google.com/videoplay?docid],a[href^=http://myspacetv.com/index.cfm?fuseaction=vids.individual&videoid],a[href^=http://vids.myspace.com/index.cfm?fuseaction=vids.individual&videoid]',1,1);
-		this.storeModule('soundplayer/flower_soundplayer.js','soundplayer',0,'*.flower_soundplayer',1,1);
+		this.storeModule('soundplayer/flower_soundplayer.js','soundplayer',0,'*.flower_soundplayer,div.flower_soundplayer_pageplayer',1,1);
 	},
 	
 	clearAutoLoad: function(moduleName) {

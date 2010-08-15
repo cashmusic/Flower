@@ -195,27 +195,31 @@ var FlowerSoundPlayer = new Class({
 					}
 				}.bind(this));
 			} else if (el.get('tag') == 'div') {
-				var elId = el.get('id'),
-					playlist = [],
-					playlistName,
-					playerUI;
-				if (elId) {
-					playlistName = elId;
+				if (el.hasClass('flower_soundplayer_pageplayer')) {
+					this.createPagePlayer(el);
 				} else {
-					playlistName = $random(10000,99999);
-				}
-				el.getElements('a').each(function(a){	
-					var parsedA = this.parseAforPlaylist(a);
-					if (parsedA) {
-						playlist.push(parsedA);
+					var elId = el.get('id'),
+						playlist = [],
+						playlistName,
+						playerUI;
+					if (elId) {
+						playlistName = elId;
+					} else {
+						playlistName = $random(10000,99999);
 					}
-				}.bind(this));
-				if (playlist.length > 0) {
-					document.id(el).set('html','');
-					this.loadPlaylist(playlistName, playlist);
-					playerUI = new defaultSoundPlayerUI(this.currentPlaylist,el);
-					playerUI.drawUI();
-					el.setStyle('visibility','visible');
+					el.getElements('a').each(function(a){	
+						var parsedA = this.parseAforPlaylist(a);
+						if (parsedA) {
+							playlist.push(parsedA);
+						}
+					}.bind(this));
+					if (playlist.length > 0) {
+						document.id(el).set('html','');
+						this.loadPlaylist(playlistName, playlist);
+						playerUI = new defaultSoundPlayerUI(this.currentPlaylist,el);
+						playerUI.drawUI();
+						el.setStyle('visibility','visible');
+					}
 				}
 			}
 		}
