@@ -118,7 +118,7 @@ var FlowerSoundPlayer = new Class({
 				var elRev = el.getProperty('rev'),
 					elLink = el.getProperty('href');
 				if (this.soundManager.canPlayURL(elLink)) {
-					var playlistName = el.getProperty('html'),
+					var playlistName = elLink,
 						elTitle = el.getProperty('title');
 					el.store('isPlaying',false);
 					el.store('prePlayTxt','');
@@ -161,17 +161,9 @@ var FlowerSoundPlayer = new Class({
 				el.setStyle('cursor','pointer');
 				el.set('html',el.retrieve('prePlayTxt') + el.retrieve('originalHTML') + el.retrieve('postPlayTxt'));
 				el.addEvent('click', function(e){
-					this.switchPlaylist(playlistName);
-					this.currentPlaylist.toggleCurrentSound();
-					// adding the link display
 					e.stop();
-					if (el.retrieve('isPlaying')) {
-						el.set('html',el.retrieve('prePauseTxt') + el.retrieve('originalHTML') + el.retrieve('postPauseTxt'));
-						el.store('isPlaying',true);
-					} else {
-						el.set('html',el.retrieve('prePlayTxt') + el.retrieve('originalHTML') + el.retrieve('postPlayTxt'));
-						el.store('isPlaying',false);
-					}
+					this.switchPlaylist(playlistName);
+					this.currentPlaylist.playOrToggleByURL(el.get('href'));
 				}.bind(this));
 				
 				// add sound state html changes
@@ -259,12 +251,13 @@ var FlowerSoundPlayer = new Class({
 					if (parsedA) {
 						playlist.push(parsedA);
 					}
+					a.removeEvents('click');
+					a.addEvent('click', function(e){
+						e.stop();
+						this.switchPlaylist(playlistName);
+						this.currentPlaylist.playOrToggleByURL(a.get('href'));
+					}.bind(this));
 				}
-				a.addEvent('click', function(e){
-					e.stop();
-					this.switchPlaylist(playlistName);
-					this.currentPlaylist.playOrToggleByURL(a.get('href'));
-				}.bind(this));
 			}.bind(this));
 			if (playlist.length > 0) {
 				this.loadPlaylist(playlistName, playlist);
