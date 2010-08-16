@@ -178,39 +178,52 @@ var FlowerImagebox = new Class({
 		el.removeEvents('click');
 		var elLink = el.getProperty('href'),
 			elTitle = el.getProperty('title'),
-			linkrev = el.getProperty('rev'),
+			elRev = el.getProperty('rev'),
 			imgWidth = 0,
 			imgHeight = 0,
 			alt = 'featured imgage',
 			splitArgument,
 			collectionPlace;
-		if (linkrev) {
-			if (linkrev.contains('imagebox:')) {
-				$A(linkrev.substring(9,linkrev.length).split(',')).each(function(argument) {
-					splitArgument = argument.split('=');
-					if (splitArgument[0] == 'width') {
-						imgWidth = splitArgument[1];
-					} else if (splitArgument[0] == 'height') {
-						imgHeight = splitArgument[1];
-					} else if (splitArgument[0] == 'alt') {
-						alt = splitArgument[1];
-					} else if (splitArgument[0] == 'collection') {
-						collectionName = splitArgument[1];
+		if (elRev) {
+			if (elRev.contains('imagebox:')) {
+				$A(elRev.substring(9,elRev.length).split(',')).each(function(argument) {
+					var splitArgument = argument.split('=');
+					switch(splitArgument[0]) {
+						case 'width':
+							if(splitArgument[1]) {
+								imgWidth = splitArgument[1];
+							}
+							break;
+						case 'height':
+							if(splitArgument[1]) {
+								imgHeight = splitArgument[1];
+							}
+							break;
+						case 'alt':
+							if(splitArgument[1]) {
+								alt = splitArgument[1];
+							}
+							break;
+						case 'collection':
+							if(splitArgument[1]) {
+								collectionName = splitArgument[1];
+							}
+							break;
 					}
 				}.bind(this));
 			}
 		}
 		// check for existing collection, create a new one if necessary
 		if (!this.collections.get(collectionName)) {this.newCollection(collectionName);}
-		collectionPlace = this.collections.get(collectionName).length;
-		this.addToCollection(collectionName,elLink,elTitle,alt,imgWidth,imgHeight);
+		collectionPlace = elLink;
+		this.addToCollection(collectionName,elLink,elTitle,alt,imgWidth,imgHeight,el);
 		el.addEvent('click', function(e){
-			this.showImage(collectionName,collectionPlace);
+			this.showImage(collectionName,elLink);
 			e.stop();
 		}.bind(this));
 	},
 	
-	showImage: function(collectionName,collectionPlace) {
+	showImage: function(collectionName,key) {
 		/*
 		Function showImage(string collectionName, integer collectionPlace)
 		
@@ -218,7 +231,7 @@ var FlowerImagebox = new Class({
 		
 		*/
 		this.currentCollection = collectionName;
-		this.currentPlace = collectionPlace;
+		this.collections.get(collectionName).set('currentKey', key);
 		if (this.state == 0) {
 			this.createDomElements();
 			this.resizeContentSpc = new Fx.Morph(this.overlayContentSpc, {duration: 400});
@@ -328,34 +341,38 @@ var FlowerImagebox = new Class({
 		Wrapper function creates a new collection in collections Hash
 		
 		*/
-		this.collections.set(collectionName, []);
+		this.collections.set(collectionName, $H());
+		this.collections.get(collectionName).set('order',[]);
+		this.collections.get(collectionName).set('currentKey',0);
 	},
 	
-	addToCollection: function(collectionName,link,caption,alt,imgWidth,imgHeight) {
+	addToCollection: function(collectionName,aHREF,aCap,imgA,imgW,imgH,el) {
 		/*
 		Function addToCollection(string collectionName, string link, string caption,
 			string alt, integer imgWidth, integer imgHeight)
 		
 		Adds image data to the specified collection
-		
-		imgData: [0] href, 
-				 [1] caption, 
-				 [2] specified 'alt', 
-				 [3] width, 
-				 [4] height,
-				 [5] loaded
 
 		*/
-		var imgData = [link,caption,alt,imgWidth,imgHeight,-1],
-			currentCollection = this.collections.get(collectionName);
-		currentCollection.push(imgData);
+		var imgData,
+			collection = this.collections.get(collectionName);
+		imgData = $H({
+			'el':el,
+			'href':aHREF,
+			'caption':aCap,
+			'alt':imgA,
+			'w':imgW,
+			'h':imgH,
+			'loaded':-1
+		});
+		collection.set(aHREF,imgData);
+		collection.get('order').push(aHREF);
 		if (this.options.fullPreload) {
-			var collectionPlace = currentCollection.length - 1;
-			this.preloadAndMeasure(collectionName,collectionPlace);
+			this.preloadAndMeasure(collectionName,aHREF);
 		}
 	},
 	
-	preloadAndMeasure: function(collectionName,collectionPlace) {
+	preloadAndMeasure: function(collectionName,key) {
 		/*
 		Function preloadAndMeasure(string collectionName, integer collectionPlace)
 		
@@ -368,33 +385,37 @@ var FlowerImagebox = new Class({
 					  1 (loaded)
 		
 		*/
-		var imgData = this.collections.get(collectionName)[collectionPlace],
-		link,imgWidth,imgHeight,imgObj;
-		if (imgData && imgData[5] == -1) {
-			imgData[5] = 0;
-			link = imgData[0],
-			imgWidth = imgData[3],
-			imgHeight = imgData[4],
+		var imgData = this.collections.get(collectionName).get(key),
+			link,imgWidth,imgHeight,imgObj;
+		if (imgData && imgData.get('loaded') == -1) {
+			imgData.set('loaded',0);
+			link = imgData.get('href'),
+			imgWidth = imgData.get('w'),
+			imgHeight = imgData.get('h'),
 			imgObj = new Image();
 			imgObj.onload = function(){
-				if (imgWidth == 0 || imgHeight ==0) {
-					imgData[3] = imgObj.width;
-					imgData[4] = imgObj.height;
+				if (imgWidth == 0 || imgHeight == 0) {
+					imgData.set('w',imgObj.width);
+					imgData.set('h',imgObj.height);
 				}
-				imgData[5] = 1;
-			};
+				imgData.set('loaded',1);
+				if(this.debugMsg) {
+					this.debugMsg(1,'loaded "' + imgObj.src + '" in collection "' + collectionName + '"');
+				}
+			}
 			imgObj.onerror = function(){
 				// onError remove from collection and remove click event
-				var currentCollection = this.collections.get(collectionName);
-				var newCollection = currentCollection.filter(function(item, index){
-					return index != collectionPlace;
-				});
-				this.collections.set(collectionName, newCollection);
-				// write debug message:
-				if(this.debugMsg) {this.debugMsg(1,'cannot load "' + imgObj.src +
-					'", removing it from collection "' + collectionName + '"');}
+				var collection = this.collections.get(collectionName)
+				if (collection.get(link).get('el')) {
+					collection.get(link).get('el').removeEvents('click');
+				}
+				collection.erase(key);
+				collection.get('order').erase(key);
+				if(this.debugMsg) {
+					this.debugMsg(1,'cannot load "' + imgObj.src + '", removing it from collection "' + collectionName + '"');
+				}
 			}.bind(this);
-			// set the src AFTER event declarations to ensure it fires in IE6 when cached
+			// set the src AFTER event declarations to ensure it fires when cached (IE6 specifically)
 			imgObj.src = link;
 		}
 	},
@@ -424,7 +445,7 @@ var FlowerImagebox = new Class({
 		this.fadeCurrentImage = new Fx.Tween(this.currentImg,{property: 'opacity',duration:200, link:'chain'});
 	},
 	
-	changeImage: function(collectionName,collectionPlace) {
+	changeImage: function(collectionName,key) {
 		/*
 		Function nextImage(string collectionName, integer collectionPlace)
 		
@@ -432,34 +453,37 @@ var FlowerImagebox = new Class({
 		ready it changes from the current image to the requested image
 		
 		*/
-		var imgData = this.collections.get(collectionName)[collectionPlace];
-		this.currentPlace = collectionPlace;
+		var collection = this.collections.get(collectionName),
+			imgData = collection.get(key);
+		collection.set('currentKey',key);
 		// begin preload and status checks
 		if (!imgData) {
 			// if !imgData, check collection length. if zero, close imagebox entirely.
-			if (this.collections.get(collectionName).length) {
+			if (collection.getLength() > 0) {
 				this.nextImage();
 			} else {
 				this.state = 11;
 				this.hideOverlay();
 			}
-		} else if (imgData[5] < 1) {
-			// if imgData[5] = -1, call preloadAndMeasure, changeImage.delay(100) then return false 
+		} else if (imgData.get('loaded') < 1) {
+			// if imgData.get('loaded') = -1, call preloadAndMeasure, changeImage.delay(100) then return false 
 			this.state = 11;
-			this.preloadAndMeasure(collectionName,collectionPlace);
-			(function() {this.changeImage(collectionName,collectionPlace);}.bind(this)).delay(100);
+			this.preloadAndMeasure(collectionName,key);
+			// really? i know this is a couple years old, but jamming in a loop instead of 
+			// firing a proper event is just lazy...FIX!
+			(function() {this.changeImage(collectionName,key);}.bind(this)).delay(100);
 		} else {
 			// loaded and ok...open up
 			this.state = 10;
 			// preload next/previous
-			this.preloadAndMeasure(this.currentCollection,this.nextPlace());
-			this.preloadAndMeasure(this.currentCollection,this.previousPlace());
+			this.preloadAndMeasure(collectionName,collection.get('order')[this.nextPlace()]);
+			this.preloadAndMeasure(collectionName,collection.get('order')[this.previousPlace()]);
 			this.fadeCurrentImage.start(0);
 			if (!this.options.fixedSize) {	
 				this.computeMaxSize();	
 				// check if dimensions have been set by preload or manually, if not use standard size
-				if (imgData[3] == 0) {this.renderboxwidth = this.options.boxwidth;} else {this.renderboxwidth = imgData[3];}
-				if (imgData[4] == 0) {this.renderboxheight = this.options.boxheight;} else {this.renderboxheight = imgData[4];}
+				if (imgData.get('w') == 0) {this.renderboxwidth = this.options.boxwidth;} else {this.renderboxwidth = imgData.get('w');}
+				if (imgData.get('h') == 0) {this.renderboxheight = this.options.boxheight;} else {this.renderboxheight = imgData.get('h');}
 				var currentMaxWidth = this.maxSize.get('x'),
 					currentMaxHeight = this.maxSize.get('y');
 				if (this.renderboxwidth > currentMaxWidth || this.renderboxheight > currentMaxHeight) {
@@ -477,8 +501,8 @@ var FlowerImagebox = new Class({
 				}
 			}
 			// check alt and caption
-			this.caption = imgData[1];
-			this.currentImg.set('alt',imgData[2]);
+			this.caption = imgData.get('caption');
+			this.currentImg.set('alt',imgData.get('alt'));
 			this.fadeOverlayCaptionSpc.set(0);
 			this.positionCaption();
 			this.state = 10;
@@ -488,7 +512,7 @@ var FlowerImagebox = new Class({
 				'margin-top': (0-(this.renderboxheight/2)-this.options.borderwidth),
 				'margin-left': (0-(this.renderboxwidth/2)-this.options.borderwidth)
 			}).chain(function(){
-				this.currentImg.src = imgData[0];
+				this.currentImg.src = imgData.get('href');
 				(function(){
 					this.fadeCurrentImage.start(1).chain(function() {
 						this.state = 11;
@@ -507,10 +531,11 @@ var FlowerImagebox = new Class({
 		for dynamic pre-loading.
 		
 		*/
-		var collectionLength = this.collections.get(this.currentCollection).length,
+		var collection = this.collections.get(this.currentCollection),
+			collectionLength = collection.get('order').length,
 			nextIndex = 0;
-		if (this.currentPlace+2 <= collectionLength) {
-			nextIndex = this.currentPlace + 1;
+		if (collection.get('order').indexOf(collection.get('currentKey'))+2 <= collectionLength) {
+			nextIndex = collection.get('order').indexOf(collection.get('currentKey')) + 1;
 		} 
 		return nextIndex;
 	},
@@ -523,10 +548,11 @@ var FlowerImagebox = new Class({
 		for dynamic pre-loading.
 		
 		*/
-		var collectionLength = this.collections.get(this.currentCollection).length,
+		var collection = this.collections.get(this.currentCollection),
+			collectionLength = collection.get('order').length,
 			previousIndex;
-		if (this.currentPlace > 0) {
-			previousIndex = this.currentPlace - 1;
+		if (collection.get('order').indexOf(collection.get('currentKey')) > 0) {
+			previousIndex = collection.get('order').indexOf(collection.get('currentKey')) - 1;
 		} else {
 			previousIndex = collectionLength - 1;
 		}
@@ -541,9 +567,10 @@ var FlowerImagebox = new Class({
 		
 		*/
 		if (this.state == 11) {
-			var collectionLength = this.collections.get(this.currentCollection).length;
+			var collection = this.collections.get(this.currentCollection),
+				collectionLength = collection.get('order').length;
 			if (collectionLength > 1) {	
-				this.changeImage(this.currentCollection,this.nextPlace());
+				this.changeImage(this.currentCollection,collection.get('order')[this.nextPlace()]);
 			}
 		}
 	},
@@ -556,9 +583,10 @@ var FlowerImagebox = new Class({
 	
 		*/
 		if (this.state == 11) {
-			var collectionLength = this.collections.get(this.currentCollection).length;
-			if (collectionLength > 1) {		
-				this.changeImage(this.currentCollection,this.previousPlace());
+			var collection = this.collections.get(this.currentCollection),
+				collectionLength = collection.get('order').length;
+			if (collectionLength > 1) {	
+				this.changeImage(this.currentCollection,collection.get('order')[this.previousPlace()]);
 			}
 		}
 	},
@@ -572,7 +600,7 @@ var FlowerImagebox = new Class({
 		
 		*/
 		if (this.state == 1) {
-			if (this.collections.get(this.currentCollection).length < 2) {
+			if (this.collections.get(this.currentCollection).get('order').length < 2) {
 				this.overlayPrevLink.setStyle('display','none');
 				this.overlayNextLink.setStyle('display','none');
 			}
@@ -590,7 +618,7 @@ var FlowerImagebox = new Class({
 		
 		*/
 		this.fadeCurrentImage.set(0);
-		this.changeImage(this.currentCollection,this.currentPlace);		
+		this.changeImage(this.currentCollection,this.collections.get(this.currentCollection).get('currentKey'));
 	},	
 	
 	hideOverlay: function() {
@@ -616,7 +644,7 @@ var FlowerImagebox = new Class({
 			}
 			this.overlayCaptionSpc.fade('hide');
 			this.parent();
-			if (this.collections.get(this.currentCollection).length < 2) {
+			if (this.collections.get(this.currentCollection).getLength() < 2) {
 				this.overlayPrevLink.setStyle('display','inline');
 				this.overlayNextLink.setStyle('display','inline');
 			}
