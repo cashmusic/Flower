@@ -1,52 +1,20 @@
 /*	
 
-flower_moviebox.js v1.2
+flower_moviebox.js v1.3
 
 a mootools based lightbox-type script for movie links and streaming content
-part of the CASH UI Tools
-more information/downloads available at: http://uitools.cashmusic.org
+part of the CASH Music Flower code
+more information/downloads available at: http://cashmusic.org/tools/
 
 inspired by slimbox versions by christophe beyls (http://www.digitalia.be)
 and aaron newton (http://clientside.cnet.com/)
 
 requires:
-• mootools v1.2
-• flower_overlay v1.0+
++ mootools v1.2.4
++ flower_overlay v1.0+
 
-revisions:
-• 1.10: fixed PC firefox closing bugs
-	    added options for link colors
-	    added support for mp4/youtube/wmv/partial asf
-	    a few minor efficiency enhancements
-	    added title support
-	    added plugin detects/treat links normally if missing
-	    renamed to "dm_moviebox" from "dm_qtbox"
-	  
-• 1.11: fixed error with IE image links
-
-• 1.12: added error handling to activeX checks
-	    improved WMP detection on PC
-	    IE6 scroll/positioning fixes
-	    disabled quicktime cache (better performance with multiple links)
-	  
-• 1.13: fixes to IE object destruction (audio kept playing)
-
-• 1.2:  reworked for mootools 1.2
-		optimizations
-		split out flower_overlay and flower_utility classes
-		allows rev-based height/width options for each link
-		added classes to most DOM elements (for CSS customization)
-		added support for vimeo and myspace links
-		removed support for windows media
-	    fixed youtube height
-	    added mobile check/override
-	    added 'esc' to close keybinding
-	    improved documentation/comments
-	    renamed to "FlowerMoviebox"
-
-
-distributed under the BSD license, terms:
-Copyright (c) 2009, CASH Music
+distributed under a BSD license, terms:
+Copyright (c) 2010, CASH Music
 All rights reserved.
  
 Redistribution and use in source and binary forms, with or without modification, 
@@ -85,54 +53,54 @@ var FlowerMoviebox = new Class({
 	
 	
 	OPTIONS:
-	• fadelevel (0.85)
+	+ fadelevel (0.85)
 	  sets the opacity level of the overlay (between 0 and 1)
 	  
-	• overlaycolor ('#000000')
+	+ overlaycolor ('#000000')
 	  sets the background color of the overlay
 	  
-	• contentspcbg ('#000000')
+	+ contentspcbg ('#000000')
 	  sets the background color of the content space
 	  
-	• linkcolor ('#999999')
+	+ linkcolor ('#999999')
 	  sets the color of links in captions and default pagination control 
 	  
-	• linkovercolor ('#ffffff')
+	+ linkovercolor ('#ffffff')
 	  sets the hover color of links
 	  
-	• textcolor ('#000000')
+	+ textcolor ('#000000')
 	  sets the default text color
 	  
-	• borderwidth (5)
+	+ borderwidth (5)
 	  sets the width (in pixels) for the content space border
 	  
-	• boxwidth (480)
+	+ boxwidth (480)
 	  default width of movie
 	  
-	• boxeight (320)
+	+ boxeight (320)
 	  default width of movie, will be adjusted for ratio and controls for 
 	  movie sharing sites
 	  
-	• caption ('')
+	+ caption ('')
 	  the caption to display by default
 	  
-	• showcontrols (false)
+	+ showcontrols (false)
 	  show/hide quicktime controls in embedded movies  
 	
 	KEY METHODS:
-	• attachToElement(anchor element el)
+	+ attachToElement(anchor element el)
 	  attaches a showMovie click event to an anchor containing a movie link
 	  
-	• showMovie(string movType, string movCaption, url movUrl, integer movWidth,
+	+ showMovie(string movType, string movCaption, url movUrl, integer movWidth,
 		 integer movHeight)
 	  opens an overlay window showthing the specified movie
 	
 	CSS CLASSES AVAILABLE FOR STYLING (from flower_overlay.js)
-	• .flower_overlay
-	• .flower_overlaycontentspc
-	• .flower_overlaycaptionspc
-	• .flower_overlaycaption
-	• .flower_overlaycontrollink
+	+ .flower_overlay
+	+ .flower_overlaycontentspc
+	+ .flower_overlaycaptionspc
+	+ .flower_overlaycaption
+	+ .flower_overlaycontrollink
 	
 	*/
 	Extends: FlowerOverlay,
@@ -146,7 +114,7 @@ var FlowerMoviebox = new Class({
 
 	initialize: function(options){
 		this.name = 'moviebox';
-		this.version = 1.2;
+		this.version = 1.3;
 		this.donotdebugoptions = false;
 		// utility object pointer below. change from flowerUID.getModule if using moviebox and
 		// utility as standalone scripts
@@ -186,11 +154,18 @@ var FlowerMoviebox = new Class({
 			if (elRev) {
 				if (elRev.contains('moviebox:')) {
 					$A(elRev.substring(9,elRev.length).split(',')).each(function(argument) {
-						splitArgument = argument.split('=');
-						if (splitArgument[0] == 'width') {
-							elWidth = splitArgument[1];
-						} else if (splitArgument[0] == 'height') {
-							elHeight = splitArgument[1];
+						var splitArgument = argument.split('=');
+						switch(splitArgument[0]) {
+							case 'width':
+								if(splitArgument[1]) {
+									elWidth = splitArgument[1];
+								}
+								break;
+							case 'height':
+								if(splitArgument[1]) {
+									elHeight = splitArgument[1];
+								}
+								break;
 						}
 					});
 				}

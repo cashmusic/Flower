@@ -3,14 +3,14 @@
 cui_utility.js v1.0
 
 measurement, detection, and conversion utility scripts
-part of the CASH UI Tools
-more information/downloads available at: http://uitools.cashmusic.org
+part of the CASH Music Flower code
+more information/downloads available at: http://cashmusic.org/tools/
 
 requires:
-• mootools v1.2.4
++ mootools v1.2.4
 
 distributed under the BSD license, terms:
-Copyright (c) 2009, CASH Music
+Copyright (c) 2010, CASH Music
 All rights reserved.
  
 Redistribution and use in source and binary forms, with or without modification, 
@@ -46,40 +46,32 @@ var FlowerUtility = new Class({
 
 
 	EVENTS:
-	• document.fontResize(int newFontSize)
+	+ document.fontResize(int newFontSize)
 	
 	KEY METHODS:
-	• testMediaQuery(string queryString)
+	+ testMediaQuery(string queryString)
 	  tests a CSS @media query, returns true or false
 	  
-	• checkForMobile()
+	+ checkForMobile()
 	  uses Moo and CSS @media query to detect mobile device
 	  
-	• startFontsizeListener()
-	  monitors font-size and will call for a document fontResize event when a user 
-	  resizes their browser's font 
-	  
-	• stopFontsizeListener()
-	  stops the fontsize listener
-	  
-	• pxToEm(int pixels)
+	+ pxToEm(int pixels)
 	  converts given pixel amount to ems (per base document ems)
 	  
-	• emToPx(int ems)
+	+ emToPx(int ems)
 	  converts given em amount to pixels (per base document ems)
 	  
-	• detectPluginOrAxo(string searchName)
+	+ detectPluginOrAxo(string searchName)
 	  scans plugins/activex for the given search name, accepts 'flash' and
 	 'quicktime' as universal shortcuts
 	
 	*/
 	initialize: function(){
 		this.name = 'utility';
-		this.version = 1.0;
+		this.version = 1.1;
 		this.donotdebugoptions = true;
 		this.documenthead = $$('head')[0];
 		this.testDiv = null;
-		this.fontsizeListener = null;
 		this.documentInfo = $H({
 			initialFontsize: 0,
 			currentFontsize: 0
@@ -103,29 +95,6 @@ var FlowerUtility = new Class({
 				'width': '1em'
 			}
 		}).injectInside(document.body);
-		this.updateDocumentInfo();
-	},
-	
-	updateDocumentInfo: function() {
-		/*
-		Function updateDocumentInfo()
-		
-		Measures the current font-size, stores it in this.documentInfo, and fires a 
-		'fontResize' document event if necessary. Given a generic name to support 
-		further tests in the future.
-		
-		*/
-		var trueCurrentFontsize = this.testDiv.getSize().x,
-			knownCurrentFontsize = this.documentInfo.get('currentFontsize');
-		if (this.documentInfo.get('initialFontsize') == 0) {
-			this.documentInfo.set('initialFontsize',trueCurrentFontsize);
-			this.documentInfo.set('currentFontsize',trueCurrentFontsize);
-		} else {
-			if (trueCurrentFontsize != knownCurrentFontsize) {
-				this.documentInfo.set('currentFontsize',trueCurrentFontsize);
-				document.fireEvent('fontResize',trueCurrentFontsize);
-			}
-		}
 	},
 	
 	testMediaQuery: function(queryString) {
@@ -206,7 +175,7 @@ var FlowerUtility = new Class({
 		Converts base ems to pixels.
 			
 		*/
-		if (!this.fontsizeDiv) {
+		if (!this.testDiv) {
 			this.createTestDiv();
 		}
 		this.updateDocumentInfo();

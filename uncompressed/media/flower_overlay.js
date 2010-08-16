@@ -1,19 +1,19 @@
 /*	
 
-flower_overlay.js v1.0
+flower_overlay.js v1.1
 
 preps the overlay area for imagebox and moviebox
-part of the CASH UI Tools
-more information/downloads available at: http://uitools.cashmusic.org
+part of the CASH Music Flower code
+more information/downloads available at: http://cashmusic.org/tools/
 
 inspired by slimbox versions by christophe beyls (http://www.digitalia.be)
 and aaron newton (http://clientside.cnet.com/)
 
 requires:
-• mootools v1.2
++ mootools v1.2
 
-distributed under the BSD license, terms:
-Copyright (c) 2009, CASH Music
+distributed under a BSD license, terms:
+Copyright (c) 2010, CASH Music
 All rights reserved.
  
 Redistribution and use in source and binary forms, with or without modification, 
@@ -48,16 +48,17 @@ var FlowerOverlay = new Class({
 	
 	
 	CSS CLASSES AVAILABLE FOR STYLING
-	• .flower_overlay
-	• .flower_overlaycontentspc
-	• .flower_overlaycaptionspc
-	• .flower_overlaycaption
-	• .flower_overlaycontrollink
+	+ .flower_overlay
+	+ .flower_overlay_contentcontainer
+	+ .flower_overlay_captioncontainer
+	+ .flower_overlay_caption
+	+ .flower_overlay_controls
+	+ .flower_overlay_controllink
 	
 	*/
 	initialize: function(){
 		this.name = 'overlay';
-		this.version = 1.0;
+		this.version = 1.1;
 		this.donotdebugoptions = true;
 	},
 

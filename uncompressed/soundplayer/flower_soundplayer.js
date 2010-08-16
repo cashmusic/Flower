@@ -1,3 +1,46 @@
+/*	
+
+flower_soundplayer.js v1.1
+
+a mootools/SM2 based audio player and playlist manager
+part of the CASH Music Flower code
+more information/downloads available at: http://cashmusic.org/tools/
+
+uses Scott Schiller's SoundManager2 for audio playback:
+http://github.com/scottschiller/SoundManager2
+
+requires:
++ mootools v 1.2.4
++ soundmanager2
+
+distributed under a BSD license, terms:
+Copyright (c) 2010, CASH Music
+All rights reserved.
+ 
+Redistribution and use in source and binary forms, with or without modification, 
+are permitted provided that the following conditions are met:
+ 
+Redistributions of source code must retain the above copyright notice, this list 
+of conditions and the following disclaimer. Redistributions in binary form must 
+reproduce the above copyright notice, this list of conditions and the following 
+disclaimer in the documentation and/or other materials provided with the 
+distribution. Neither the name of CASH Music nor the names of its contributors 
+may be used to endorse or promote products derived from this software without 
+specific prior written permission.
+ 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
+INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+POSSIBILITY OF SUCH DAMAGE.
+
+*/
+
 var FlowerSoundPlayer = new Class({
 
 /*
@@ -6,15 +49,6 @@ var FlowerSoundPlayer = new Class({
 * SoundPlayer class:
 * The SoundPlayer class manages a playlist of Sound objects, and (by default)
 * creates a UI from which they can be controlled.
-*
-* Events:
-* play
-* stop
-* soundEnd
-* ready
-* position
-* progress
-* statusChange
 *
 *
 */
@@ -33,7 +67,7 @@ var FlowerSoundPlayer = new Class({
 	initialize: function(options) {
 		this.setOptions(options);
 		this.name = 'soundplayer';
-		this.version = 1.0;
+		this.version = 1.1;
 		this.donotdebugoptions = false;
 		this.sm2Loaded = false;
 		this.currentSound = null;
@@ -315,10 +349,6 @@ var FlowerSoundPlayer = new Class({
 	*
 	*
 	*/
-
-	//playAdHocSound: function(whichSound) {
-	//	this.currentPlaylist.playSound(whichsound);
-	//},
 	
 	playCurrentSound: function() {
 		if (this.currentPlaylist === null) {
@@ -401,10 +431,6 @@ var FlowerSoundPlayer = new Class({
 	*
 	* onError(string errorType, string errorMessage)
 	*
-	* onStatusChange(string url, number length, number position, 
-	*                number bytesTotal, number bytesLoaded,
-	*                number loadPercentage, number approximatePosition)
-	*
 	*
 	*/
 
@@ -453,21 +479,6 @@ var SoundPlaylist = new Class({
 	*
 	*
 	* media control functions:
-	*
-	* playSound(string whichSound)
-	* plays a specific sound. expecting 'next','forcenext','previous','random', or 'first'
-	*
-	* resumeCurrentSound()
-	* plays the current sound from its last position
-	*
-	* pauseCurrentSound()
-	* stops the current sound 
-	*
-	* toggleCurrentSound()
-	* switches between stop and play on the current sound
-	*
-	* jumpCurrentSoundTo(number ms)
-	* jumps the current sound to 
 	*
 	*
 	*/

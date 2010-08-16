@@ -3,18 +3,18 @@
 flower_imagebox.js v1.2
 
 a mootools based lightbox-type script
-part of the CASH UI Tools
-more information/downloads available at: http://uitools.cashmusic.org
+part of the CASH Music Flower code
+more information/downloads available at: http://cashmusic.org/tools/
 
 inspired by slimbox versions by christophe beyls (http://www.digitalia.be)
 and aaron newton (http://clientside.cnet.com/)
 
 requires:
-• mootools v 1.2.4
-• flower_overlay v1.0+
++ mootools v 1.2.4
++ flower_overlay v1.0+
 
-distributed under the BSD license, terms:
-Copyright (c) 2009, CASH Music
+distributed under a BSD license, terms:
+Copyright (c) 2010, CASH Music
 All rights reserved.
  
 Redistribution and use in source and binary forms, with or without modification, 
@@ -54,65 +54,58 @@ var FlowerImagebox = new Class({
 	
 	
 	OPTIONS:
-	• fadelevel (0.85)
+	+ fadelevel (0.85)
 	  sets the opacity level of the overlay (between 0 and 1)
 	  
-	• overlaycolor ('#000000')
+	+ overlaycolor ('#000000')
 	  sets the background color of the overlay
 	  
-	• contentspcbg ('#ffffff')
+	+ contentspcbg ('#ffffff')
 	  sets the background color of the content space
 	  
-	• linkcolor ('#999999')
+	+ linkcolor ('#999999')
 	  sets the color of links in captions and default pagination control 
 	  
-	• linkovercolor ('#ffffff')
+	+ linkovercolor ('#ffffff')
 	  sets the hover color of links
 	  
-	• textcolor ('#cccccc')
+	+ textcolor ('#cccccc')
 	  sets the default text color
 	  
-	• borderwidth (5)
+	+ borderwidth (5)
 	  sets the width (in pixels) for the content space border
 	  
-	• boxwidth (60)
+	+ boxwidth (60)
 	  default width of images, shown at first opening of overlay
 	  
-	• boxheight (60)
+	+ boxheight (60)
 	  default height of images, shown at first opening of overlay
 	  
-	• zindex (1234)
+	+ zindex (1234)
 	  sets default z-index for the overlay DIV
 	  
-	• fixedSize (false)
+	+ fixedSize (false)
 	  if true, width and height will not be computed — images will all be forced to 
 	  the default boxwidth and boxheight
 	  
-	• fullPreload (true)
+	+ fullPreload (true)
 	  choose between a full pre-load (true) of all images, or a dynamic pre-load 
 	  (false) for larger collections. dynamic pre-load loads the current, next, and
 	  previous images as requested.
 	
 	KEY METHODS:
-	• attachToElement(anchor element el)
+	+ attachToElement(anchor element el)
 	  attaches a showImage click event to an anchor containing an image link
 	  
-	• newCollection(string collectionName)
+	+ newCollection(string collectionName)
 	  creates a new collection with the specified name
 	  
-	• addToCollection(string collectionName, string link, string caption,
+	+ addToCollection(string collectionName, string link, string caption,
 			string alt, integer imgWidth, integer imgHeight)
 	  adds an image to a specified collection
 	  
-	• showImage(string collectionName, integer collectionPlace)
+	+ showImage(string collectionName, integer collectionPlace)
 	  opens an overlay window showing the specified image
-	
-	CSS CLASSES AVAILABLE FOR STYLING (from flower_overlay.js)
-	• .flower_overlay
-	• .flower_overlaycontentspc
-	• .flower_overlaycaptionspc
-	• .flower_overlaycaption
-	• .flower_overlaycontrollink
 	
 	*/
 	Extends: FlowerOverlay,

@@ -1,22 +1,21 @@
 /*	
 
-flower_anchor.js v1.0
+flower_anchor.js
 
 anchor functionality enhancements
-part of the CASH UI Tools
-more information/downloads available at: http://uitools.cashmusic.org
+part of the CASH Music Flower code
+more information/downloads available at: http://cashmusic.org/tools/
 
 revisions:
-• 1.0: initial release. includes:
-			FlowerLinkExternal (v1.1),
-			FlowerLinkPopup (v1.0),
-      		FlowerLinkInside(v1.1)
+	FlowerLinkExternal (v1.1),
+	FlowerLinkPopup (v1.0),
+	FlowerLinkInside(v1.2)
 
 requires:
-• mootools v 1.2.4
++ mootools v 1.2.4
 
-distributed under the BSD license, terms:
-Copyright (c) 2009, CASH Music
+distributed under a BSD license, terms:
+Copyright (c) 2010, CASH Music
 All rights reserved.
  
 Redistribution and use in source and binary forms, with or without modification, 
@@ -117,7 +116,7 @@ var FlowerLinkInside = new Class({
 	*/
 	initialize: function(){
 		this.name = 'linkinside';
-		this.version = 1.1;
+		this.version = 1.2;
 	},
 	
 	attachToElement: function(el){ 
@@ -222,14 +221,24 @@ var FlowerDrawer = new Class({
 		if (elRev) {
 			if (elRev.contains('drawer:')) {
 				$A(elRev.substring(7,elRev.length).split(',')).each(function(argument) {
-					splitArgument = argument.split('=');
-					if (splitArgument[0] == 'target') {
-						drawertarget = document.id(splitArgument[1]);
-					} else if (splitArgument[0] == 'hideLink' && splitArgument[1]) {
-						hideLink = splitArgument[1];
-					} else if (splitArgument[0] == 'altLinkText' && splitArgument[1]) {
-						// altLinkText cannot currently contain commas
-						altLinkText = splitArgument[1];
+					var splitArgument = argument.split('=');
+					switch(splitArgument[0]) {
+						case 'target':
+							if(splitArgument[1]) {
+								drawertarget = document.id(splitArgument[1]);
+							}
+							break;
+						case 'hideLink':
+							if(splitArgument[1]) {
+								hideLink = splitArgument[1];
+							}
+							break;
+						case 'altLinkText':
+							if(splitArgument[1]) {
+								// altLinkText cannot currently contain commas
+								altLinkText = splitArgument[1];
+							}
+							break;
 					}
 				});
 			}

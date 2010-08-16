@@ -3,16 +3,17 @@
 flower_core.js v1.0
 
 Flower core class
-more information/downloads available at: http://uitools.cashmusic.org
+part of the CASH Music Flower code
+more information/downloads available at: http://cashmusic.org/tools/
 
 revisions:
-• 1.0: initial release
++ 1.0: initial release
 
 requires:
-• mootools v 1.2.4
++ mootools v 1.2.4
 
-distributed under the BSD license, terms:
-Copyright (c) 2009, CASH Music
+distributed under a BSD license, terms:
+Copyright (c) 2010, CASH Music
 All rights reserved.
  
 Redistribution and use in source and binary forms, with or without modification, 
@@ -141,32 +142,32 @@ var FlowerCore = new Class({
 	
 
 	OPTIONS:
-	• debug (0)
+	+ debug (0)
 	  if true, debug information will be sent to the console
 	  
-	• autoBoot (0)
+	+ autoBoot (0)
 	  if true, Flower will scan the page for specified selectors and auto-launch
 	  appropriate modules
 	  
-	• timeout (500)
+	+ timeout (500)
 	  the number of ms a module is permitted to load before it is declared not 
 	  loaded (by error)
 
 	EVENTS:
-	• moduleLoad (string moduleName)
+	+ moduleLoad (string moduleName)
 	  fires when a module is loaded, returning the name of the module
 	  
-	• bootComplete (bool)
+	+ bootComplete (bool)
 	  fires after bootstrap() has been called and all modules are loaded or 
 	  have timed out. returns true if all modules have been loaded, false if
 	  fired on error/timeout
 	  
-	• htmlChanged (mixed (string elementName) OR (element el))
+	+ htmlChanged (mixed (string elementName) OR (element el))
 	  fires when an element's html property has been changed. relies on module
 	  to callback, so not absolute.
 	  
 	KEY METHODS:
-	• storeModule(string filePath,
+	+ storeModule(string filePath,
 				  string moduleName,
 				  mixed (string dependencies) OR (false), 
 				  string autoLaunchBySelectors, 
@@ -180,36 +181,33 @@ var FlowerCore = new Class({
 	  selector. relativePath specifies if the filePath is relative to the current 
 	  FlowerCore.js file, or if it is fully qualified. 
 	  
-	• loadModule(string moduleName)
+	+ loadModule(string moduleName)
 	  loads a module by name
 	  
-	• getModule(string moduleName)
+	+ getModule(string moduleName)
 	  attempts to get a module by name, returning either a pointer object for the
 	  initiated module, or null if the module has not been loaded
 	  
-	• getModuleOptions(string moduleName)
+	+ getModuleOptions(string moduleName)
 	  returns a module's options property
 	  
-	• setModuleOptions(string moduleName, object optionsObj)
+	+ setModuleOptions(string moduleName, object optionsObj)
 	  sets a simple options object to pass to the initialization of a new module
 	  object, allowing a module to be called with the specified options
 	  
-	• clearAutoLoad(string moduleName)
+	+ clearAutoLoad(string moduleName)
 	  clears a module's autoLaunchBySelectors property
 	  
-	• addToAutoLoad(string moduleName, string selectorString)
+	+ addToAutoLoad(string moduleName, string selectorString)
 	  accepts a comma separated list of CSS selectors to add to a module's
 	  autoLaunchBySelectors property
 	  
-	• bootstrap()
+	+ bootstrap()
 	  auto-launches all appropriate modules for the current page, firing the
 	  bootComplete event when finished (successfully or not)
 	
 	*/
 	Implements: [Options, Events, FlowerDebug],
-	
-	name: 'Flower',
-	version: 1.0,
 	
 	options: {
 		debug: 0,
@@ -219,6 +217,8 @@ var FlowerCore = new Class({
 	
 	initialize: function(options){
 		this.setOptions(options);
+		this.name = 'Flower';
+		this.version = 1.0;
 		this.modules = $H();
 		this.commonCache = $H(); // common memory space for all Flower modules
 		this.injectedFiles = [];
