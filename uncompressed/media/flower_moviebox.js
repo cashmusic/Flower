@@ -211,6 +211,8 @@ var FlowerMoviebox = new Class({
 				elHeight = (elWidth*0.5625).round()+26;
 			} else if (elLinkLc.test(/vimeo.com\/\d/) && this.flashDetected) {
 				elMovieType = 'vm';
+			} else if (elLinkLc.contains('vevo.com/watch') && this.flashDetected) {
+				elMovieType = 'vv';
 			}
 			if (elMovieType) {
 				el.removeEvents('click');
@@ -283,7 +285,7 @@ var FlowerMoviebox = new Class({
 			this.currentMovie = document.getElementById(this.options.movieObjectName);
 			// delay setting state to allow QT to be fully initialized...helps fix audio bug
 			(function(){this.state = 11;}.bind(this)).delay(1200);
-		} else if (this.movieType == 'yt' || this.movieType == 'gv' || this.movieType == 'vm' || this.movieType == 'ms') {
+		} else if (this.movieType == 'yt' || this.movieType == 'gv' || this.movieType == 'vm' || this.movieType == 'ms' || this.movieType == 'vv') {
 			var videoObjURL = this.parseVideoURL(this.movieurl);
 			this.overlayContentSpc.set('html','<object id="'+this.options.movieObjectName+'" standby="loading video..." type="application/x-shockwave-flash" width="'+this.renderboxwidth+'" height="'+this.renderboxheight+'" data="'+videoObjURL+'"><param name="movie" value="'+videoObjURL+'" /><param name="bgcolor" value="'+this.options.contentspcbg+'" /><param name="allowFullScreen" value="true" /><param name="wmode" value="window" /></object>');
 			this.currentMovie = document.id(this.options.movieObjectName);
@@ -325,6 +327,11 @@ var FlowerMoviebox = new Class({
 		} else if (urlLc.contains('vimeo.com/')) {
 			newUrl = this.movieurl.replace('vimeo.com/','vimeo.com/moogaloop.swf?clip_id=');
 			newUrl += '&amp;server=www.vimeo.com&amp;fullscreen=1&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0';
+		} else if (urlLc.contains('vevo.com/watch')) {
+			newUrl = 'http://www.vevo.com/VideoPlayer/Embedded?videoId=';
+			miscVar = urlLc.lastIndexOf('/')+1;
+			newUrl += urlLc.substr(miscVar,urlLc.length - miscVar);
+			newUrl += '&autoplay=1&playerType=embedded&playlist=false';
 		} 
 		return newUrl;
 	},
