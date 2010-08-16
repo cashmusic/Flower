@@ -498,7 +498,7 @@ var SoundPlaylist = new Class({
 				id: theSound.url, 
 				url: theSound.url,
 				onfinish: function() {
-					this.SoundPlayer.fireEvent('stop');
+					this.SoundPlayer.fireEvent('stop',this.currentSound.sound.url);
 					this.playSound('next');
 				}.bind(this),
 				whileplaying: function() {
@@ -599,7 +599,7 @@ var SoundPlaylist = new Class({
 		this.makeCurrent();
 		if (this.currentSound.sound.paused) {
 			this.currentSound.sound.resume();
-			this.SoundPlayer.fireEvent('resume');
+			this.SoundPlayer.fireEvent('resume',this.currentSound.sound.url);
 		}
 	},
 	
@@ -618,7 +618,7 @@ var SoundPlaylist = new Class({
 		this.makeCurrent();
 		if (this.currentSound.sound.playState == 1) {
 			this.currentSound.sound.pause();
-			this.SoundPlayer.fireEvent('pause');
+			this.SoundPlayer.fireEvent('pause',this.currentSound.sound.url);
 		}
 	},
 	
@@ -626,7 +626,7 @@ var SoundPlaylist = new Class({
 		this.makeCurrent();
 		if (this.currentSound.sound.playState != 0) {
 			this.currentSound.sound.stop();
-			this.SoundPlayer.fireEvent('stop');
+			this.SoundPlayer.fireEvent('stop',this.currentSound.sound.url);
 		}
 	},
 	

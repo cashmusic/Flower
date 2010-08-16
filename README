@@ -1,8 +1,0 @@
-These scripts are in-use throughout cashmusic.org, but need tweaks and
-updates before being released publicly. The general idea is that there's
-a single master JS object that serves as namespace and controller for
-any number of smaller script modules. It also launches external scripts
-as needed, and can auto-attach behaviors to elements. 
-
-The 1.0 version of Flower will focus on SoundPlayer, adding HTML5 
-capabilities and more flexible playlist and event functionality. 
