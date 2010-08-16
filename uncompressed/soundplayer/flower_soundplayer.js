@@ -38,7 +38,7 @@ var FlowerSoundPlayer = new Class({
 		this.sm2Loaded = false;
 		this.currentSound = null;
 		this.currentPlaylist = null;
-		this.Playlists = new Hash();
+		this.Playlists = $H();
 		this.soundManager = null;
 		this.sm2LoadTimer = null;
 		this.sm2LoadTime = 0;
@@ -89,21 +89,6 @@ var FlowerSoundPlayer = new Class({
 		}.bind(this));
 		soundManager.beginDelayedInit(); // start SM2 init.
 	},
-	
-	
-	
-	
-	/*
-	*
-	*
-	*
-	*
-	Taken directly from imagebox
-	*
-	*
-	*
-	*
-	*/
 	
 	attachToElement: function(el) {
 		/*
@@ -456,7 +441,7 @@ var SoundPlaylist = new Class({
 
 	initialize: function(name) {
 		this.SoundPlayer = null;
-		this.sounds = new Hash();	
+		this.sounds = $H();	
 		this.currentSound = null;
 		this.currentKey = 0;
 		this.usingHTML5 = false;
@@ -629,15 +614,7 @@ var SoundPlaylist = new Class({
 	stopCurrentSound: function() {
 		this.makeCurrent();
 		if (this.currentSound.sound.playState != 0) {
-			/*
-			this.currentSound.sound.setPosition(0);
-			if (this.currentSound.sound.isHTML5) {
-				// HTML5 has no true "stop" — unloading the media can cause warnings that confuse and bewilder the iphone
-				this.currentSound.sound.pause();
-			} else {
-			*/
-				this.currentSound.sound.stop();
-			//}
+			this.currentSound.sound.stop();
 			this.SoundPlayer.fireEvent('stop');
 		}
 	},
@@ -763,7 +740,7 @@ var defaultSoundPlayerUI = new Class({
 		if (this.options.forceAppleiDevice) {
 			this.isAppleiDevice = true;
 		}
-		this.allPlaylistLi = new Hash();
+		this.allPlaylistLi = $H();
 		this.notesSpan = new Element('span',{
 			text:'(tap to stop)',
 			'styles':{'display':'none','color':'#111','padding-left':'1em'}
@@ -775,7 +752,7 @@ var defaultSoundPlayerUI = new Class({
 		// positionStyle - the position indicator
 		// controlsStyle - the div containing control buttons
 		//
-		this.elementStyles = new Hash({
+		this.elementStyles = $H({
 			'seekbarSpc': {'position':'relative','background-color':'#666','height':'9px','width':'100%','margin-top':'4px','overflow':'hidden'},
 			'seekbar': {'position':'absolute','background-color':'#c00','height':'9px','width':'0%','cursor':'pointer','z-index':'10'},
 			'position': {'position':'absolute','left':'0%','width':'3px','height':'9px','background-color':'#000','z-index':'15'},
@@ -873,7 +850,7 @@ var defaultSoundPlayerUI = new Class({
 				tmpLi.addEvent('click', function(){
 		        	this.handlePlaylistLiClick(track.sound.url);
 		        }.bind(this));
-				this.allPlaylistLi.set(track.sound.url,new Hash({'li':tmpLi,'titlespan':tmpTitleSpan,'timespan':tmpTimeSpan}));
+				this.allPlaylistLi.set(track.sound.url,$H({'li':tmpLi,'titlespan':tmpTitleSpan,'timespan':tmpTimeSpan}));
 			},this);
 			
 			this.mainPlaylistOl.inject(this.playerSpc);

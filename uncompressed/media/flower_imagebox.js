@@ -160,7 +160,7 @@ var FlowerImagebox = new Class({
 				var divCollection = 'default',
 					elid = el.get('id');
 				if (elid) {divCollection = elid;}
-				el.getElements('a[href*=.jpg],a[href*=.jpeg],a[href*=.gif],a[href*=.png]').each(function(a){	
+				el.getElements('a[href*=.jpg],a[href*=.jpeg],a[href*=.gif],a[href*=.png]').each(function(a){
 					this.addFromLink(a,divCollection);
 				}.bind(this));
 			}
