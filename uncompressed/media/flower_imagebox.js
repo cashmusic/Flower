@@ -382,9 +382,9 @@ var FlowerImagebox = new Class({
 			link,imgWidth,imgHeight,imgObj;
 		if (imgData && imgData.get('loaded') == -1) {
 			imgData.set('loaded',0);
-			link = imgData.get('href'),
-			imgWidth = imgData.get('w'),
-			imgHeight = imgData.get('h'),
+			link = imgData.get('href');
+			imgWidth = imgData.get('w');
+			imgHeight = imgData.get('h');
 			imgObj = new Image();
 			imgObj.onload = function(){
 				if (imgWidth == 0 || imgHeight == 0) {
@@ -395,10 +395,10 @@ var FlowerImagebox = new Class({
 				if(this.debugMsg) {
 					this.debugMsg(1,'loaded "' + imgObj.src + '" in collection "' + collectionName + '"');
 				}
-			}
+			};
 			imgObj.onerror = function(){
 				// onError remove from collection and remove click event
-				var collection = this.collections.get(collectionName)
+				var collection = this.collections.get(collectionName);
 				if (collection.get(link).get('el')) {
 					collection.get(link).get('el').removeEvents('click');
 				}

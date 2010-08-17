@@ -187,7 +187,7 @@ var FlowerDrawer = new Class({
 	closedrawer: function(drawer) {
 		drawer.setStyle('height', 1);
 		drawer.setStyle('display', 'none');
-		drawer.store('FlowerDrawer_state',1);			
+		drawer.store('FlowerDrawer_state',1);
 	},
 	
 	toggle: function(drawer,link) {
@@ -273,7 +273,7 @@ var FlowerDrawer = new Class({
 						computedDisplay = computedDisplay.getPropertyValue('display');
 					} else {
 						// Safari 2 getComputedStyle() bug workaround:
-						computedDisplay = 'none'
+						computedDisplay = 'none';
 					}
 				}				
 				if (computedDisplay == 'none') {

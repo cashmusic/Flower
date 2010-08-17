@@ -502,27 +502,28 @@ var SoundPlaylist = new Class({
 					this.playSound('next');
 				}.bind(this),
 				whileplaying: function() {
-					if (!this.currentSound.sound.loaded) {
-						currentDuration = this.currentSound.sound.durationEstimate;
+					var s = this.currentSound.sound;
+					if (!s.loaded) {
+						currentDuration = s.durationEstimate;
 					} else {
-						currentDuration = this.currentSound.sound.duration;
+						currentDuration = s.duration;
 					}
-					approximatePosition = this.currentSound.sound.position / currentDuration;
-					this.SoundPlayer.fireEvent('position', [approximatePosition,this.currentSound.sound.url]);
+					approximatePosition = s.position / currentDuration;
+					this.SoundPlayer.fireEvent('position', [approximatePosition,s.url]);
 					
 					currentDuration = Math.round(currentDuration / 1000);
-					figureSeconds = Math.floor(currentDuration % 60);
-					figureSeconds = (String(figureSeconds).length < 2) ? figureSeconds = String("0" + figureSeconds) :  figureSeconds = String(figureSeconds);
-					currentDuration = Math.floor(currentDuration / 60) + ':' + figureSeconds;
+					figureSec = Math.floor(currentDuration % 60);
+					figureSec = (String(figureSec).length < 2) ? figureSec = String("0" + figureSec) :  figureSec = String(figureSec);
+					currentDuration = Math.floor(currentDuration / 60) + ':' + figureSec;
 					
-					currentPosition = Math.round(this.currentSound.sound.position / 1000);
-					figureSeconds = Math.floor(currentPosition % 60);
-					figureSeconds = (String(figureSeconds).length < 2) ? figureSeconds = String("0" + figureSeconds) :  figureSeconds = String(figureSeconds);
-					currentPosition = Math.floor(currentPosition / 60) + ':' + figureSeconds;
+					currentPosition = Math.round(s.position / 1000);
+					figureSec = Math.floor(currentPosition % 60);
+					figureSec = (String(figureSec).length < 2) ? figureSec = String("0" + figureSec) :  figureSec = String(figureSec);
+					currentPosition = Math.floor(currentPosition / 60) + ':' + figureSec;
 					
-					this.SoundPlayer.fireEvent('positiontime', [currentPosition + ' / ' + currentDuration,this.currentSound.sound.url]);
+					this.SoundPlayer.fireEvent('positiontime', [currentPosition + ' / ' + currentDuration,s.url]);
 					if (this.usingHTML5) {
-						loadPercentage = this.currentSound.sound.bytesLoaded / this.currentSound.sound.bytesTotal;
+						loadPercentage = s.bytesLoaded / s.bytesTotal;
 						this.SoundPlayer.fireEvent('progress', loadPercentage);
 					}
 				}.bind(this),
@@ -531,7 +532,7 @@ var SoundPlaylist = new Class({
 						loadPercentage = this.currentSound.sound.bytesLoaded / this.currentSound.sound.bytesTotal;
 						this.SoundPlayer.fireEvent('progress', loadPercentage);
 					}
-				}.bind(this),
+				}.bind(this)
 			}),
 			title: theSound.title,
 			artist: theSound.artist
@@ -703,7 +704,7 @@ var SoundPlayerUI = new Class({
 			this.allSoundKeys = this.playlist.allSoundKeys;
 		} else {
 			if (this.options.debug) {
-				this.debugMessage('No playlist specified, cannot draw UI.')
+				this.debugMessage('No playlist specified, cannot draw UI.');
 			}
 		}
 	},
@@ -792,7 +793,6 @@ var defaultSoundPlayerUI = new Class({
 	},
 
 	handlePlaylistLiClick: function(url) {
-		var sound = this.playlist.sounds.get(url);
 		this.playlist.SoundPlayer.switchPlaylist(this.playlist.name);
 		this.playlist.playOrToggleByURL(track.sound.url);
 	},
@@ -834,7 +834,7 @@ var defaultSoundPlayerUI = new Class({
 							this.playlist.playOrToggleByURL(track.sound.url);
 				        }.bind(this)
 					}
-				}).inject(tmpLi);;
+				}).inject(tmpLi);
 			},this);
 			
 			this.mainPlaylistOl.inject(this.playerSpc);
@@ -859,11 +859,11 @@ var defaultSoundPlayerUI = new Class({
 				}).inject(tmpLi);
 				var tmpTimeSpan = new Element('span',{'styles':{'padding-left':'1.95em','color':'#fff'}}).inject(tmpLi);
 				tmpLi.addEvent('click', function(){
-		        	this.handlePlaylistLiClick(track.sound.url);
-		        }.bind(this));
+					this.handlePlaylistLiClick(track.sound.url);
+				}.bind(this));
 				this.allPlaylistLi.set(track.sound.url,$H({'li':tmpLi,'titlespan':tmpTitleSpan,'timespan':tmpTimeSpan}));
 			},this);
-			
+
 			this.mainPlaylistOl.inject(this.playerSpc);
 		}
 	},
@@ -932,8 +932,8 @@ var defaultSoundPlayerUI = new Class({
 			'styles': this.elementStyles.get('controlImageStyles'),
 			'events': {
 				'click': function(){
-			       	this.playlist.playSound('previous');
-		        }.bind(this)
+					this.playlist.playSound('previous');
+				}.bind(this)
 			}
 		}).inject(this.controls);
 		this.playPauseEl = new Element('img', {
@@ -942,8 +942,8 @@ var defaultSoundPlayerUI = new Class({
 			'styles': this.elementStyles.get('controlImageStyles'),
 			'events': {
 				'click': function(){
-			       	this.playlist.toggleCurrentSound();
-		        }.bind(this)
+					this.playlist.toggleCurrentSound();
+				}.bind(this)
 			}
 		}).inject(this.controls);
 		this.nextEl = new Element('img', {
@@ -989,7 +989,7 @@ var defaultSoundPlayerUI = new Class({
 		// add seekbar/position events:
 		this.playlist.SoundPlayer.addEvent('progress', function(val) {
 			if (this.playlist.SoundPlayer.currentPlaylist == this.playlist) {
-				if (val < .95) {
+				if (val < 0.95) {
 					var totalwidth = this.seekbarSpc.getSize().x;
 					this.seekbar.setStyle('width',Math.round(totalwidth*val));
 				} else {

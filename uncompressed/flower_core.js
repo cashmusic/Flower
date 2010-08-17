@@ -62,10 +62,10 @@ var FlowerDebug = new Class({
 		
 		// check for console
 
-		if(typeof(console) != 'object') var console = {};
-		if(!console.log) console.log = function(){};
-		if(!console.warn) console.warn = console.log;
-		if(!console.error) console.error = console.warn;
+		if(typeof(console) != 'object') {var console = {};}
+		if(!console.log) {console.log = function(){};}
+		if(!console.warn) {console.warn = console.log;}
+		if(!console.error) {console.error = console.warn;}
 	},
 	
 	debugMsg: function(type,msg) {
