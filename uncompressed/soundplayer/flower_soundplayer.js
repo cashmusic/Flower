@@ -1012,26 +1012,26 @@ var defaultSoundPlayerUI = new Class({
 		}.bind(this));
 		
 		// add image play/pause state events:
-		this.playlist.SoundPlayer.addEvent('play', function() {
-			if (this.playlist.SoundPlayer.currentPlaylist == this.playlist) {
+		this.playlist.SoundPlayer.addEvent('play', function(url) {
+			if (this.playlist.SoundPlayer.currentPlaylist == this.playlist && this.playlist.currentSound.sound.url == url) {
 				this.playPauseEl.set('src',this.controlImages.pause);
 			}
 		}.bind(this));
 
-		this.playlist.SoundPlayer.addEvent('resume', function() {
-			if (this.playlist.SoundPlayer.currentPlaylist == this.playlist) {
+		this.playlist.SoundPlayer.addEvent('resume', function(url) {
+			if (this.playlist.SoundPlayer.currentPlaylist == this.playlist && this.playlist.currentSound.sound.url == url) {
 				this.playPauseEl.set('src',this.controlImages.pause);
 			}
 		}.bind(this));
 
-		this.playlist.SoundPlayer.addEvent('pause', function() {
-			if (this.playlist.SoundPlayer.currentPlaylist == this.playlist) {
+		this.playlist.SoundPlayer.addEvent('pause', function(url) {
+			if (this.playlist.SoundPlayer.currentPlaylist == this.playlist && this.playlist.currentSound.sound.url == url) {
 				this.playPauseEl.set('src',this.controlImages.play);
 			}
 		}.bind(this));
 
-		this.playlist.SoundPlayer.addEvent('stop', function() {
-			if (this.playlist.SoundPlayer.currentPlaylist == this.playlist) {
+		this.playlist.SoundPlayer.addEvent('stop', function(url) {
+			if (this.playlist.SoundPlayer.currentPlaylist == this.playlist && this.playlist.currentSound.sound.url == url) {
 				this.playPauseEl.set('src',this.controlImages.play);
 			}
 		}.bind(this));
