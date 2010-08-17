@@ -190,24 +190,34 @@ var FlowerDrawer = new Class({
 		drawer.store('FlowerDrawer_state',1);			
 	},
 	
-	toggle: function(drawer) {
+	toggle: function(drawer,link) {
 		var stripheight;
 		if (drawer.retrieve('FlowerDrawer_state') == 11) {
 			stripheight = drawer.getScrollSize().y;
 			drawer.store('FlowerDrawer_state',10);
 			drawer.setStyle('height', stripheight);
-			drawer.get('tween', {property: 'height',duration: 400}).start(stripheight,1).chain(function(){
+			drawer.get('tween', {property: 'height',duration: 250,link: 'cancel'}).start(stripheight,1).chain(function(){
 				drawer.setStyle('display', 'none');
 				drawer.store('FlowerDrawer_state',1);
+				var altText = drawer.retrieve('FlowerDrawer_altText');
+				if (altText) {
+					drawer.store('FlowerDrawer_altText',link.get('html'));
+					link.set('html',altText);
+				}
 			}.bind(this));
 		} else if (drawer.retrieve('FlowerDrawer_state') == 1) {
 			drawer.store('FlowerDrawer_state',10);
 			drawer.setStyle('display', 'block');
 			stripheight = drawer.getScrollSize().y;
-			drawer.get('tween', {property: 'height',duration: 400}).start(1,stripheight).chain(function(){
+			drawer.get('tween', {property: 'height',duration: 250,link: 'cancel'}).start(1,stripheight).chain(function(){
 				// set the height back to auto to allow window resize
 				drawer.setStyle('height', 'auto');
 				drawer.store('FlowerDrawer_state',11);
+				var altText = drawer.retrieve('FlowerDrawer_altText');
+				if (altText) {
+					drawer.store('FlowerDrawer_altText',link.get('html'));
+					link.set('html',altText);
+				}
 			}.bind(this));
 		}
 	},
@@ -271,18 +281,13 @@ var FlowerDrawer = new Class({
 				} else {
 					drawertarget.store('FlowerDrawer_state',11);
 					if (this.options.closeOnAttach) {
-						this.toggle(drawertarget);
+						this.toggle(drawertarget,el);
 					}
 				}
 				el.addEvent('click', function(e){
 					var altText;
 					e.stop();
-					this.toggle(drawertarget);
-					altText = drawertarget.retrieve('FlowerDrawer_altText');
-					if (altText) {
-						drawertarget.store('FlowerDrawer_altText',el.get('html'));
-						el.set('html',altText);
-					}
+					this.toggle(drawertarget,el);
 					if (hideLink) {
 						el.setStyle('display','none');
 					}
