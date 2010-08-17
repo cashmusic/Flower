@@ -116,7 +116,7 @@ var FlowerImagebox = new Class({
 		boxwidth: 60,
 		boxheight: 60,
 		fixedSize: false,
-		fullPreload: true
+		fullPreload: false
 	},
 
 	initialize: function(options){
