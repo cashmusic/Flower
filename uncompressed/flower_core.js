@@ -226,7 +226,12 @@ var FlowerCore = new Class({
 		this.timeout = this.options.timeout;
 		this.documenthead = $$('head')[0];
 		// determine file location as Flower library path
-		if (document.id('flower_core')) {this.libpath = document.id('flower_core').getProperty('src').replace('flower_core.js','');}
+		var flower_core =  this.documenthead.getElement('script[src*=flower_core.js]');
+		if (flower_core) {
+			var src = flower_core.getProperty('src');
+			this.libpath = src.substring(0,src.lastIndexOf("/")+1);
+			console.log(this.libpath);
+		}
 		
 		// hide/show ifjs_ specials
 		$$('*.ifjs_visibilityhidden','div.flower_soundplayer').each(function(el){el.setStyle('visibility','hidden');});
@@ -245,7 +250,7 @@ var FlowerCore = new Class({
 			if (this.libpath) {
 				console.log('Flower (v' + this.version + ') loaded.\n\tPath: \'' + this.libpath + '\'' + '\n\tMooTools version: ' + MooTools.version + '\n\tOptions: ' + allOptions);
 			} else {
-				console.log('Flower loaded with errors. Version: ' + this.version + ' Path unknown. Please add id="flower_core" to script declaration' + '\n\tOptions: ' + allOptions);
+				console.log('Flower loaded with errors. Version: ' + this.version + ' Path unknown. Please make sure the flower core JS file is named "flower_core.js"' + '\n\tOptions: ' + allOptions);
 			}
 		}
 	},
