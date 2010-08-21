@@ -4,7 +4,7 @@ Plugin Name: CASH Music Flower
 Plugin URI: http://cashmusic.org/tools/
 Description: Adds MooTools 1.2.4 and Flower 1.0 to the head of a Wordpress template.
 Version: 1.0
-Author: Jesse von Doom
+Author: CASH Music
 Author URI: http://cashmusic.org/
 License: BSD
 
@@ -38,31 +38,23 @@ POSSIBILITY OF SUCH DAMAGE.
 
 class wpFlowerPlugin {
 	
-	var $plugin_name;
-	var $plugin_base;
-
 	function wpFlowerPlugin() {	
-		$this->register_plugin('flower', __FILE__);
-		add_action('init', 'insert_flower_scripts');
+		add_action('init', array('wpFlowerPlugin','insert_flower_scripts'));
 	}
 	
-	function register_plugin($name, $base) {
-		//the name of the plugin	
-		$this->plugin_name = $this->plugin_name = $name;
-		//the absolute path base of the plugin
-		$this->plugin_base = rtrim(dirname($base), '/');
-	}
-	
-	function caption_shortcode( $atts, $content = null ) {
+	function flower_shortcode( $atts, $content = null ) {
 	   return '<div class="flower_soundplayer_pageplayer"></div>';
 	}
 	
 	function insert_flower_scripts() {
+		$corepath = plugins_url('/assets/scripts/flower_core.js', __FILE__);
+		$initpath = plugins_url('/assets/scripts/flower_init.js', __FILE__);
+		
+		add_shortcode('flower_soundplayer_pageplayer', array('wpFlowerPlugin','flower_shortcode'));
+		
 		wp_enqueue_script('mootools', 'http://ajax.googleapis.com/ajax/libs/mootools/1.2.4/mootools-yui-compressed.js');
-		wp_enqueue_script('flower_core', this->plugin_base.'/assets/scripts/flower_core.js');
-		wp_enqueue_script('flower_init', this->plugin_base.'/assets/scripts/flower_init.js');
-	
-		add_shortcode('flower_soundplayer_pageplayer', 'caption_shortcode');
+		wp_enqueue_script('flower_core', $corepath,array('mootools'),1.0);
+		wp_enqueue_script('flower_init', $initpath,array('mootools','flower_core'),1.0);
 		
 		return true;
 	}
