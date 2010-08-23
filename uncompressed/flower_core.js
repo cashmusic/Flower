@@ -230,7 +230,6 @@ var FlowerCore = new Class({
 		if (flower_core) {
 			var src = flower_core.getProperty('src');
 			this.libpath = src.substring(0,src.lastIndexOf("/")+1);
-			console.log(this.libpath);
 		}
 		
 		// hide/show ifjs_ specials

@@ -104,11 +104,11 @@ var FlowerMoviebox = new Class({
 	
 	*/
 	Extends: FlowerOverlay,
-	Implements: Options,
+	Implements: [Options,Events],
 
 	options: {
 		caption: '',
-		movieObjectName: 'moviebox' + $random(10000,99999),
+		movieObjectID: 'moviebox' + $random(10000,99999),
 		showcontrols: 'false'
 	},
 
@@ -116,6 +116,8 @@ var FlowerMoviebox = new Class({
 		this.name = 'moviebox';
 		this.version = 1.3;
 		this.donotdebugoptions = false;
+		this.currentMovie = null;
+		this.movieurl = null;
 		// utility object pointer below. change from flowerUID.getModule if using moviebox and
 		// utility as standalone scripts
 		this.flower_utility = flowerUID.getModule('utility');
@@ -253,20 +255,21 @@ var FlowerMoviebox = new Class({
 		*/
 		if (this.movieType == 'qt') { 
 			if (Browser.Engine.trident) {
-				this.overlayContentSpc.set('html','<object classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" standby="loading quicktime..." codebase="http://www.apple.com/qtactivex/qtplugin.cab" width="'+this.renderboxwidth+'" height="'+this.renderboxheight+'" id="'+this.options.movieObjectName+'"><param name="src" value="'+this.movieurl+'" /><param name="scale" value="aspect" /><param name="controller" value="'+this.options.showcontrols+'" /><param name="cache" value="false" /><param name="autoplay" value="true" /><param name="bgcolor" value="'+this.options.contentspcbg+'" /><param name="enablejavascript" value="true" /></object>');
+				this.overlayContentSpc.set('html','<object classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" standby="loading quicktime..." codebase="http://www.apple.com/qtactivex/qtplugin.cab" width="'+this.renderboxwidth+'" height="'+this.renderboxheight+'" id="'+this.options.movieObjectID+'"><param name="src" value="'+this.movieurl+'" /><param name="scale" value="aspect" /><param name="controller" value="'+this.options.showcontrols+'" /><param name="cache" value="false" /><param name="autoplay" value="true" /><param name="bgcolor" value="'+this.options.contentspcbg+'" /><param name="enablejavascript" value="true" /></object>');
 			} else {
-				this.overlayContentSpc.set('html','<object id="'+this.options.movieObjectName+'" standby="loading quicktime..." type="video/quicktime" codebase="http://www.apple.com/qtactivex/qtplugin.cab" data="'+this.movieurl+'" width="'+this.renderboxwidth+'" height="'+this.renderboxheight+'"><param name="src" value="'+this.movieurl+'" /><param name="scale" value="aspect" /><param name="controller" value="'+this.options.showcontrols+'" /><param name="cache" value="false" /><param name="autoplay" value="true" /><param name="bgcolor" value="'+this.options.contentspcbg+'" /><param name="enablejavascript" value="true" /></object>');
+				this.overlayContentSpc.set('html','<object id="'+this.options.movieObjectID+'" standby="loading quicktime..." type="video/quicktime" codebase="http://www.apple.com/qtactivex/qtplugin.cab" data="'+this.movieurl+'" width="'+this.renderboxwidth+'" height="'+this.renderboxheight+'"><param name="src" value="'+this.movieurl+'" /><param name="scale" value="aspect" /><param name="controller" value="'+this.options.showcontrols+'" /><param name="cache" value="false" /><param name="autoplay" value="true" /><param name="bgcolor" value="'+this.options.contentspcbg+'" /><param name="enablejavascript" value="true" /></object>');
 			}
-			this.currentMovie = document.getElementById(this.options.movieObjectName);
+			this.currentMovie = document.getElementById(this.options.movieObjectID);
 			// delay setting state to allow QT to be fully initialized...helps fix audio bug
 			(function(){this.state = 11;}.bind(this)).delay(1200);
 		} else if (this.movieType == 'yt' || this.movieType == 'gv' || this.movieType == 'vm' || this.movieType == 'ms' || this.movieType == 'vv') {
 			var videoObjURL = this.parseVideoURL(this.movieurl);
-			this.overlayContentSpc.set('html','<object id="'+this.options.movieObjectName+'" standby="loading video..." type="application/x-shockwave-flash" width="'+this.renderboxwidth+'" height="'+this.renderboxheight+'" data="'+videoObjURL+'"><param name="movie" value="'+videoObjURL+'" /><param name="bgcolor" value="'+this.options.contentspcbg+'" /><param name="allowFullScreen" value="true" /><param name="wmode" value="window" /></object>');
-			this.currentMovie = document.id(this.options.movieObjectName);
+			this.overlayContentSpc.set('html','<object id="'+this.options.movieObjectID+'" standby="loading video..." type="application/x-shockwave-flash" width="'+this.renderboxwidth+'" height="'+this.renderboxheight+'" data="'+videoObjURL+'"><param name="movie" value="'+videoObjURL+'" /><param name="bgcolor" value="'+this.options.contentspcbg+'" /><param name="allowFullScreen" value="true" /><param name="wmode" value="window" /><param name="allowScriptAccess" value="always" /></object>');
+			this.currentMovie = document.id(this.options.movieObjectID);
 			this.state = 11;
 		}
 		this.positionCaption();
+		this.fireEvent('videoCreated',this.currentMovie);
 	},
 	
 	parseVideoURL: function(url) {
@@ -301,7 +304,7 @@ var FlowerMoviebox = new Class({
 			if (miscVar > -1) {newUrl = newUrl.substr(0,miscVar);}
 		} else if (urlLc.contains('vimeo.com/')) {
 			newUrl = this.movieurl.replace('vimeo.com/','vimeo.com/moogaloop.swf?clip_id=');
-			newUrl += '&amp;server=www.vimeo.com&amp;fullscreen=1&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0';
+			newUrl += '&amp;server=vimeo.com&amp;fullscreen=1&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;js_api=1&amp;autoplay=1';
 		} else if (urlLc.contains('vevo.com/watch')) {
 			newUrl = 'http://www.vevo.com/VideoPlayer/Embedded?videoId=';
 			miscVar = urlLc.lastIndexOf('/')+1;
@@ -334,7 +337,7 @@ var FlowerMoviebox = new Class({
 				}
 			}
 			this.currentMovie = null;
-			this.overlayContentSpc.set('html','');	
+			this.overlayContentSpc.set('html','');
 			this.movieType = false;
 			this.parent();
 			this.state = 1;
