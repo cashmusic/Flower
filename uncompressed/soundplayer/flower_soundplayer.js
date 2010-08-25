@@ -937,7 +937,7 @@ var defaultSoundPlayerUI = new Class({
 			}
 		}).inject(this.controls);
 		this.playPauseEl = new Element('img', {
-			'class':'play',alt:'play',
+			'class':'flower_soundplayer_play',alt:'play',
 			src:this.controlImages.play,
 			'styles': this.elementStyles.get('controlImageStyles'),
 			'events': {
@@ -947,7 +947,7 @@ var defaultSoundPlayerUI = new Class({
 			}
 		}).inject(this.controls);
 		this.nextEl = new Element('img', {
-			'class':'next',alt:'next',
+			'class':'flower_soundplayer_next',alt:'next',
 			src:this.controlImages.next,
 			'styles': this.elementStyles.get('controlImageStyles'),
 			'events': {
