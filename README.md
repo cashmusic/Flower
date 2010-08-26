@@ -17,7 +17,7 @@ use as a base for the nerdier. Most functionality works automatically with
 nothing more than a class name added to a div or a link.
 
 
-SOUNDPLAYER
+###Soundplayer###
 To use the Soundplayer module just add the 'flower_soundplayer' class to a 
 link or a div. Added to a div it will search the div for links to audio and
 populate a player. If no title is present the player will use the text between
@@ -32,7 +32,7 @@ player from all stray audio links on the page. This only grabs audio that has
 not already been included in a player or given the 'flower_soundplayer' class.
 
 
-IMAGEBOX
+###Imagebox###
 To create an Imagebox collection you need only add the 'flower_imagebox' class 
 to a link that points to an image. That image will be loaded in a lightbox. You
 can also add the 'flower_imagebox' class to a div and all links to images will
@@ -45,7 +45,7 @@ collection name in the rev attribute like so:
     <a href="image.jpg" rev="imagebox:collection=mine">thumbnail</a>
 
 
-MOVIEBOX
+###Moviebox###
 The Moviebox works automatically by scanning for links to YouTube, Vimeo,
 Google Video, MySpace TV, and Vevo pages. It also works on links to certain
 Quicktime media. Flower will automatically determine if a users browser 
@@ -56,19 +56,19 @@ link. Size can be changed using the rev attribute:
     <a href="http://vimeo.com/175757" rev="moviebox:width=600,height=450">movie</a>
 
 
-ADVANCED STUFF
+###Advanced Stuff###
 (Advanced documentation and demos coming soon)
 
 
 
-CSS CLASSES
+###CSS Classes###
 The following classes are set when any content is displayed, allowing all
 Flower features to be skinned with ease. Be sure to use the !important
 declaration in your styles as all elements have been styled to a default set
 of styles already.
 
 
-CSS CLASSES: SOUNDPLAYER
+###CSS Classes: Soundplayer###
     a.flower_soundplayer // add to an audio link for inline play
         span.flower_soundplayer_inlineplaypause // the inserted play / pause text
 
@@ -89,7 +89,7 @@ CSS CLASSES: SOUNDPLAYER
             li.flower_soundplaylist_altli // even numbered lis
 		
 				
-CSS CLASSES: OVERLAYS (MOVIEBOX AND IMAGEBOX)
+###CSS Classes: Overlays (Moviebox and Imagebox)###
     a.flower_imagebox // add to an image — added to default or specified collection
     div.flower_imagebox // add flower_imagebox to a div to create a collection
 
