@@ -1,4 +1,4 @@
-##Flower##
+#Flower#
 Flower provides easily used and easily customized functionality for media pages. 
 The primary tools are photo and video lightboxes, some basic behaviors, and an
 audio player / playlist manager using SoundManager 2.
