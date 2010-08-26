@@ -61,7 +61,7 @@ link. Size can be changed using the rev attribute:
 
 
 
-###CSS Classes###
+##CSS Classes##
 The following classes are set when any content is displayed, allowing all
 Flower features to be skinned with ease. Be sure to use the !important
 declaration in your styles as all elements have been styled to a default set
