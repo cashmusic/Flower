@@ -21,7 +21,7 @@ SOUNDPLAYER
 To use the Soundplayer module just add the 'flower_soundplayer' class to a 
 link or a div. Added to a div it will search the div for links to audio and
 populate a player. If no title is present the player will use the text between
-the <a> tag as the track title. If you'd like to specify your own title just
+the link tag as the track title. If you'd like to specify your own title just
 add it to the--wait for it--title of the link.
 
 When added to a link element, the 'flower_soundplayer' class will add [play] to
@@ -42,7 +42,7 @@ By default be included in the 'default' collection. To create multiple
 collections either add an id to each 'flower_imagebox' div, or specify a
 collection name in the rev attribute like so: 
 
-<a href="image.jpg" rev="imagebox:collection=mine">thumbnail</a>
+    <a href="image.jpg" rev="imagebox:collection=mine">thumbnail</a>
 
 
 MOVIEBOX
@@ -53,7 +53,7 @@ supports Quicktime, Flash (and soon HTML5.) Then it plays a movie at the
 default size of 640x360. A title can be added using the title attribute of the
 link. Size can be changed using the rev attribute:
 
-<a href="http://vimeo.com/175757" rev="moviebox:width=600,height=450">movie</a>
+    <a href="http://vimeo.com/175757" rev="moviebox:width=600,height=450">movie</a>
 
 
 ADVANCED STUFF
