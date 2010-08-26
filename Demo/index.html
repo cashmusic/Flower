@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-<title>CASH Music: Flower 1.0 Preview</title>
+<title>CASH Music: Flower</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link rel="icon" type="image/png" href="http://cashmusic.org/images/icons/cash.png" /> 
 
@@ -19,32 +19,34 @@
 	<div id="cashstatementspc"> 
 		<div id="cash_sitelogo"><a href="/"><img src="http://cashmusic.org/assets/images/cash.png" alt="CASH Music" width="30" height="30" /></a></div> 
 		<div id="mainmenu"> 
-			<a href="http://cashmusic.org/about/">About</a> 
-			<a href="http://blog.cashmusic.org/">Blog</a> 
-			<a href="http://cashmusic.org/showcase/">Showcase</a> 
-			<a href="http://cashmusic.org/donate/">Give Support</a> 
-			<a href="http://cashmusic.org/tools/">Download</a> 
+			<a href="http://cashmusic.org/about/">About CASH Music</a> 
+			<a href="http://cashmusic.org/donate/">Donate</a> 
 			<a href="http://help.cashmusic.org/">Get Help</a> 
 		</div> 
 	</div>
 	
 	<div id="mainspc">
 		<div id="aboutspc"> 
-			<h1>Flower 1.0 (In Progress)</h1> 
+			<h1>Flower v1.0</h1> 
 			<p class="openingp"> 
-				100% driven by lazy-loading JavaScript and a handful of CSS, with an emphasis on progressive enhancement.
-			</p><p> 
-				The <b>Flower Core</b> loads, scans CSS classes and/or HREF information, loads required components, and remains available as a means of centralizing events. Both <b>Moviebox</b> and <b>Imagebox</b> extend a generic overlay class to display lightboxed images (loaded via class) and videos (loaded via HREF.) 
-			</p><p> 
-				The <b>Soundplayer</b> is an extensible playlist manager for SoundManager2 with intelligent switching of multiple playlists through one object instance. Audio can be loaded using a classed div, a classed anchor, or directly. The default UI is easily skinnable via CSS and can be fully overwritten via MooTools Class structures. A rich event structure can be used to do AJAX API authentication/requests for a tracked or secure player. Oh and it supports HTML5, has an iPhone-specific interface, and can pull in SoundCloud sets as playlists.
+				Flower is a JavaScript library designed to give musicians easy access to UI tools 
+				like image/video lightboxes and sound players.
 			</p><p>
-				There are various other UI enhancements, some useful utility scripts, etc. Before 1.0 release we're adding HTML5 support for video, Flickr support, iPhone views for the overlay stuff, optimizations, etc.
+				All Flower modules have been built to work easily or automatically. The Moviebox
+				lightbox detects links to YouTube, Vimeo, Google Video, MySpace TV, Vevo, and 
+				Quicktime video files. The Imagebox module only requires you to add a class to a links
+				or divs — same for Soundplayer.
+			</p><p>
+				These scripts are built using <a href="http://mootools.net/">MooTools</a> and the
+				Soundplayer is powered by the excellent <a href="http://www.schillmania.com/projects/soundmanager2/">SoundManager 2</a> by Scott Schiller.
+				For more information and advanced usage please refer to the included README file.
 			</p>
 			<br /> 
 		</div>
 			
 		<div>
 			<h2>Moviebox</h2>
+			<p >Links to video sites and quicktime files are automatically lightboxed:</p>
 			<div class="oneoffour firstcol">
 				<a href="http://youtube.com/watch?v=IntMIqUk1Mg" title="Zan Lyons live in Leeds" class="nofx"><img src="assets/images/moviebox/youtube.jpg" alt="youtube" width="100%"/></a><br />
 				<span class="notation">YouTube, default settings.</span>
@@ -61,17 +63,15 @@
 			
 			<div class="clearfix">.</div><br />
 			
-			<a href="http://www.vevo.com/watch/kid-cudi/pursuit-of-happiness-megaforce-version/USUV70902741">Veeeeeeeeeeeeeeeeevvvvvo</a>
-			<br /><br />
-			
 			<h2>Imagebox</h2>
+			<p>Images are automatically added to galleries by using the 'flower_imagebox' class on a div or link:</p>
 			<div class="oneoffour firstcol"> 
 				<a href="assets/images/imagebox/portugaltheman.jpg" class="flower_imagebox nofx" title="Portugal. The Man" rev="imagebox:collection=justthisone"><img src="assets/images/imagebox/portugaltheman_sm.jpg" alt="portugal the man" width="100%"/></a> 
 				<br /> 
 				<span class="notation">A single image.</span> 
 			</div><div class="oneoffour"> 
 				<a href="assets/images/imagebox/freemusic.jpg" class="flower_imagebox nofx" title="50FOOTWAVE: Free Music [cover]" rev="imagebox:collection=scalingimagebox"><img src="assets/images/imagebox/scaling_sm.jpg" alt="scaling imagebox" width="100%"/></a> 
-				<a href="assets/images/imagebox/cassettecity.jpg" title="Lushlife: Cassette City [cover]" rev="imagebox:collection=scalingimagebox" class="flower_imagebox ifjsdisplaynone nofx">Lushlife: Cassette City</a> 
+				<a href="assets/images/imagebox/cassettecity.jpg" title="Lushlife: Cassette City [cover]" rev="imagebox:collection=scalingimagebox" class="flower_imagebox ifjs_displaynone nofx">Lushlife: Cassette City</a> 
 				<br /> 
 				<span class="notation">Oversized images<br />(will scale.)</span> 
 			</div><div id="deerhoofcollection" class="oneoftwo lastcol flower_imagebox nofx"> 
@@ -92,10 +92,17 @@
 			<div class="clearfix">.</div><br />
 		
 			<h2>Soundplayer</h2>
-			<a href="http://s3.amazonaws.com/cash_users/calexico/live/02.mp3" class="flower_soundplayer">Quick Test</a><br />
-			<a href="http://s3.amazonaws.com/cash_users/calexico/live/03.mp3">Quicker Test (no flower_soundplayer class)</a> <a class="flower_drawertoggle ifjsdisplayi" rev="drawer:target=pagePlayerTarget,altLinkText=[close page player],horizontalDrawer=true,forceWidthHeight=400">[open page player]</a>
+			<p>
+				Soundplayers are created by adding the 'flower_soundplayer' class to a div containing links to audio files.
+				Multiple players are handled intelligently, and by adding 'flower_soundplayer' to a link outside a 
+				soundplayer div you can even play links inline, like with this link to 
+				<a href="http://s3.amazonaws.com/cash_users/calexico/live/01.mp3" class="flower_soundplayer">"Roka" by Calexico</a>.
+			</p><p>
+				There is also a special 'flower_soundplayer_pageplayer' that can be added to a div, gathering all audio links on a 
+				page not included in other soundplayers for a play-this-page style player.  <a class="flower_drawertoggle ifjsdisplayi" rev="drawer:target=pagePlayerTarget,altLinkText=[close page player],horizontalDrawer=true,forceWidthHeight=400">[open page player]</a>
+				<a href="https://s3.amazonaws.com/cash_users/bukeandgass/riposte/01MedullaOblongata.mp3" style="display:none;">Buke &amp; Gass: Medulla Oblongata (hidden link)</a> 
+			</p>
 			<div id="pagePlayerTarget" class="flower_soundplayer_pageplayer ifjs_displaynone"><small>Play all un-spoken-for MP3s:<br /><br /></small></div>
-			<br /><br />
 			<div id="soundplayerspc" class="flower_soundplayer oneoftwo firstcol">
 				<a href="http://s3.amazonaws.com/cash_users/kristinhersh/Crooked/release/128/07Crooked.mp3">Kristin Hersh: Crooked</a><br />
 				<a href="http://s3.amazonaws.com/cash_users/learningmusic/vos003/02MyOriginalDictionary.mp3" title="Learning Music: My Original Dictionary">Learning Music: My Original Dictionary</a><br />
@@ -114,6 +121,7 @@
 			<div class="clearfix">.</div><br />
 
 			<h2>Anchor enhancements</h2>
+			<p>We've also included some handy things like sliding content drawers, progressive-enhancement popup links, and some very basic AJAX behavior:
 			<div class="oneofthree firstcol">
 				<a href="http://cashmusic.org" class="external">external anchor</a><br />
 				<a href="http://50footwave.cashmusic.org/" class="popup" rev="popup:width=750,height=590">linkpopup anchor</a>

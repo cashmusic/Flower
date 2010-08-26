@@ -97,3 +97,4 @@ ol.li {font-size:0.65em;}
 
 #pagePlayerTarget {position:fixed;background-color:#000;color:#fff;top:0;left:40px;width:400px;height:auto;padding:0 6px 0 6px;z-index:12345;}
 #pagePlayerTarget div.flower_soundplayer {padding-bottom:6px;}
+#pagePlayerTarget div.flower_soundplayer_time, #pagePlayerTarget li {font-size:0.7em !important;color:#666 !important;}
