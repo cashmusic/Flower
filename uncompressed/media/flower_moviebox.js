@@ -176,10 +176,10 @@ var FlowerMoviebox = new Class({
 			if ((elLinkLc.contains('.mov') || elLinkLc.contains('.mp4')) && this.qtDetected) {
 				elMovieType = 'qt';
 				if (this.options.showcontrols == 'true') {elHeight += 16;}
-			} else if (elLinkLc.contains('youtube.com/watch?v=') && this.flashDetected) {
+			} else if (elLinkLc.contains('youtube.com/watch?v=')) {
 				elMovieType = 'yt';
 				elHeight = (elWidth*0.5625).round()+25;
-			} else if (elLinkLc.test(/vimeo.com\/\d/) && this.flashDetected) {
+			} else if (elLinkLc.test(/vimeo.com\/\d/)) {
 				elMovieType = 'vm';
 			} else if (elLinkLc.contains('vevo.com/watch') && this.flashDetected) {
 				elMovieType = 'vv';
@@ -255,7 +255,12 @@ var FlowerMoviebox = new Class({
 			this.currentMovie = document.getElementById(this.options.movieObjectID);
 			// delay setting state to allow QT to be fully initialized...helps fix audio bug
 			(function(){this.state = 11;}.bind(this)).delay(1200);
-		} else if (this.movieType == 'yt' || this.movieType == 'vm' || this.movieType == 'vv') {
+		} else if (this.movieType == 'yt' || this.movieType == 'vm') {
+			var videoObjURL = this.parseVideoURL(this.movieurl);
+			this.overlayContentSpc.set('html','<iframe src="'+videoObjURL+'" width="'+this.renderboxwidth+'" height="'+this.renderboxheight+'" frameborder="0" webkitAllowFullScreen allowFullScreen></iframe>');
+			this.currentMovie = document.id(this.options.movieObjectID);
+			this.state = 11;
+		} else if (this.movieType == 'vv') {
 			var videoObjURL = this.parseVideoURL(this.movieurl);
 			this.overlayContentSpc.set('html','<object id="'+this.options.movieObjectID+'" standby="loading video..." type="application/x-shockwave-flash" width="'+this.renderboxwidth+'" height="'+this.renderboxheight+'" data="'+videoObjURL+'"><param name="movie" value="'+videoObjURL+'" /><param name="bgcolor" value="'+this.options.contentspcbg+'" /><param name="allowFullScreen" value="true" /><param name="wmode" value="window" /><param name="allowScriptAccess" value="always" /></object>');
 			this.currentMovie = document.id(this.options.movieObjectID);
@@ -282,13 +287,14 @@ var FlowerMoviebox = new Class({
 			urlLc = url.toLowerCase(),
 			miscVar;
 		if (urlLc.contains('youtube.com/watch?v=')) {
-			newUrl = url.replace(/watch\?v\=/i,'v/');
+			newUrl = url.replace(/watch\?v\=/i,'embed/');
 			miscVar = newUrl.indexOf('&');
 			if (miscVar > -1) {newUrl = newUrl.substr(0,miscVar);}
-			newUrl += '&amp;autoplay=1';
+			newUrl += '?autoplay=1&amp;rel=0&amp;hd=1';
 		} else if (urlLc.contains('vimeo.com/')) {
-			newUrl = this.movieurl.replace('vimeo.com/','vimeo.com/moogaloop.swf?clip_id=');
-			newUrl += '&amp;server=vimeo.com&amp;fullscreen=1&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;js_api=1&amp;autoplay=1';
+			cleanedUrl = this.movieurl.replace('www.','');
+			newUrl = cleanedUrl.replace('vimeo.com/','player.vimeo.com/video/');
+			newUrl += '?title=1&amp;byline=1&amp;portrait=1&amp;autoplay=1';
 		} else if (urlLc.contains('vevo.com/watch')) {
 			newUrl = 'http://www.vevo.com/VideoPlayer/Embedded?videoId=';
 			miscVar = urlLc.lastIndexOf('/')+1;
@@ -315,7 +321,7 @@ var FlowerMoviebox = new Class({
 					this.currentMovie.style.display = 'none';
 				}
 			} else {
-				if (!Browser.Engine.trident) {
+				if (!Browser.Engine.trident && this.movieType == 'vv') {
 					// IE doesn't play well with dispose() on an <object>
 					this.currentMovie.dispose();
 				}
