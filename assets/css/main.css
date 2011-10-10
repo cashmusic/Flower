@@ -14,7 +14,7 @@ h2 {font:2em/1.5em HelveticaNeueLTStd-UltLt,"HelveticaNeueLT Std UltLt","Helveti
 #mainspc {position:relative;margin:0 auto 0 auto;width:705px;padding:0 30px 0 20px;}
 #cash_sitelogo {position:absolute;top:8px;right:8px;text-align:right;overflow:hidden;height:46px;width:46px;z-index:2345;}
 #cash_sitelogo a {border:0;margin-left:0;}
-#cashstatementspc {position:relative;width:100%;height:auto;padding:90px 0 30px 0;min-width:755px;z-index:100;background:transparent url(/assets/images/rainbow.gif) top right no-repeat;}
+#cashstatementspc {position:relative;width:100%;height:auto;padding:90px 0 30px 0;min-width:755px;z-index:100;background:transparent;}
 #cashstatement {position:relative;margin:0 auto 0 auto;width:705px;padding:0 30px 0 20px;}
 .openingp {font-size:1.6em;line-height:1.25em;margin-bottom:1em;}
 .homeh1 {font-size:4.75em;margin-bottom:0.125em;}
@@ -34,7 +34,7 @@ h2 {font:2em/1.5em HelveticaNeueLTStd-UltLt,"HelveticaNeueLT Std UltLt","Helveti
 .lastcol a:hover {color:#fff;background-color:#0594e0;border:2px solid #0594e0;}
 
 /* FOOTER (base code taken from cssstickyfooter.com) */
-* {margin-top:0;margin-bottom;padding-top:0;padding-bottom:0;} 
+* {margin-top:0;margin-bottom:0;;padding-top:0;padding-bottom:0;} 
 html, body, #wrap {height:100%;}
 body > #wrap {height:auto;min-height:100%;}
 #mainspc {padding-bottom:90px;}

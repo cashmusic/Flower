@@ -67,7 +67,7 @@ var FlowerSoundPlayer = new Class({
 	initialize: function(options) {
 		this.setOptions(options);
 		this.name = 'soundplayer';
-		this.version = 1.1;
+		this.version = 1.2;
 		this.donotdebugoptions = false;
 		this.sm2Loaded = false;
 		this.currentSound = null;
@@ -813,77 +813,30 @@ var defaultSoundPlayerUI = new Class({
 	},
 	
 	addPlaylistElements: function() {
-		if (!this.isAppleiDevice) {
-			var liCount = 1;
-			this.mainPlaylistOl = new Element('ol',{
-				'class':'flower_soundplaylist',
-				'styles':{'font-size':'0.85em','padding':0,'margin':0,'list-style-type':'decimal-leading-zero'}
-			});
-			this.playlist.sounds.each(function(track,index) { 
-				var tmpLi = new Element('li',{'styles':{'list-style-position':'inside'}}).inject(this.mainPlaylistOl);
-				if (liCount%2 == 0) {
-					tmpLi.addClass('flower_soundplaylist_altli');
+		var liCount = 1;
+		this.mainPlaylistOl = new Element('ol',{
+			'class':'flower_soundplaylist',
+			'styles':{'font-size':'0.85em','padding':0,'margin':0,'list-style-type':'decimal-leading-zero'}
+		});
+		this.playlist.sounds.each(function(track,index) { 
+			var tmpLi = new Element('li',{'styles':{'list-style-position':'inside'}}).inject(this.mainPlaylistOl);
+			if (liCount%2 == 0) {
+				tmpLi.addClass('flower_soundplaylist_altli');
+			}
+			liCount += 1;
+			var tmpTitleSpan = new Element('span',{
+				text:track.title,
+				'styles':{'cursor':'pointer'},
+				'events':{
+					'click': function(){
+						this.playlist.SoundPlayer.switchPlaylist(this.playlist.name);
+						this.playlist.playOrToggleByURL(track.sound.url);
+			        }.bind(this)
 				}
-				liCount += 1;
-				var tmpTitleSpan = new Element('span',{
-					text:track.title,
-					'styles':{'cursor':'pointer'},
-					'events':{
-						'click': function(){
-							this.playlist.SoundPlayer.switchPlaylist(this.playlist.name);
-							this.playlist.playOrToggleByURL(track.sound.url);
-				        }.bind(this)
-					}
-				}).inject(tmpLi);
-			},this);
-			
-			this.mainPlaylistOl.inject(this.playerSpc);
-		} else {
-			this.mainPlaylistOl = new Element('ol',{'styles':{'font-size':'0.85em','padding':0,'margin':0,'list-style-type':'decimal-leading-zero'}});
-			this.playlist.sounds.each(function(track,index) { 
-				var tmpLi = new Element('li',{'styles':{
-					'list-style-position':'inside',
-					'background':'-webkit-gradient(linear, left top, left bottom, from(#666), to(#222))',
-					'border':'1px solid #777',
-					'-webkit-border-radius':'3px',
-					'margin-bottom':'4px',
-					'padding':'3px',
-					'height':'4em',
-					'cursor':'pointer',
-					'color':'#fff'
-					}
-				}).inject(this.mainPlaylistOl);
-				var tmpTitleSpan = new Element('span',{
-					text:track.title,
-					'styles':{'font-size':'1.5em','line-height':'1em','font-weight':'bold','display':'block'}
-				}).inject(tmpLi);
-				var tmpTimeSpan = new Element('span',{'styles':{'padding-left':'1.95em','color':'#fff'}}).inject(tmpLi);
-				tmpLi.addEvent('click', function(){
-					this.handlePlaylistLiClick(track.sound.url);
-				}.bind(this));
-				this.allPlaylistLi.set(track.sound.url,$H({'li':tmpLi,'titlespan':tmpTitleSpan,'timespan':tmpTimeSpan}));
-			},this);
-
-			this.mainPlaylistOl.inject(this.playerSpc);
-		}
-	},
-	
-	addPlaylistEvents: function() {
-		if (!this.isAppleiDevice) {
-			// placeholder. do bold/color for current track in std playlist
-		} else {
-			this.playlist.SoundPlayer.addEvent('play',function(url){
-				if (this.playlist.SoundPlayer.currentPlaylist == this.playlist) {
-					this.highlightPlayingLi(url);
-				}
-			}.bind(this));
-			
-			this.playlist.SoundPlayer.addEvent('positiontime',function(val,url){
-				if (this.playlist.SoundPlayer.currentPlaylist == this.playlist) {
-					this.allPlaylistLi.get(url).get('timespan').set('html',val);
-				}
-			}.bind(this));
-		}
+			}).inject(tmpLi);
+		},this);
+		
+		this.mainPlaylistOl.inject(this.playerSpc);
 	},
 	
 	drawPlaylist: function() {
@@ -891,7 +844,6 @@ var defaultSoundPlayerUI = new Class({
 		if (!this.playerSpc) {calledAlone = true;}
 		if (calledAlone) {this.playerSpc = new Element('div', {'class': 'flower_soundplayer'});}
 		this.addPlaylistElements();
-		this.addPlaylistEvents();
 		if (calledAlone) {this.playerSpc.inject(document.id(this.targetElement));}
 	},
 	
@@ -1056,10 +1008,6 @@ var defaultSoundPlayerUI = new Class({
 	
 	drawUI: function() {
 		this.playerSpc = new Element('div', {'class': 'flower_soundplayer'});
-		if (this.isAppleiDevice) {
-			this.options.drawController = false;
-			this.options.drawPlaylist = true;
-		}
 		if (this.options.drawController) {this.drawController();}
 		if (this.options.drawPlaylist) {this.drawPlaylist();}
 		this.playerSpc.inject(document.id(this.targetElement));
@@ -1071,8 +1019,7 @@ window.addEvent('domready', function(){
 		// point the SM2 paths relative to the Flower core:
 		flowerUID.setModuleOptions('soundplayer',{
 			sm2Location: flowerUID.libpath + 'soundplayer/lib/soundmanager2/soundmanager2.js',
-			sm2swfLocation: flowerUID.libpath + 'soundplayer/lib/soundmanager2/swf/',
-			forceFlash: true
+			sm2swfLocation: flowerUID.libpath + 'soundplayer/lib/soundmanager2/swf/'
 		});
 		// register with a delayed call-back:
 		var player = flowerUID.registerModule(FlowerSoundPlayer,'soundplayer',true);

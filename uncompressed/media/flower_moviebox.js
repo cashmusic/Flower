@@ -179,13 +179,6 @@ var FlowerMoviebox = new Class({
 			} else if (elLinkLc.contains('youtube.com/watch?v=') && this.flashDetected) {
 				elMovieType = 'yt';
 				elHeight = (elWidth*0.5625).round()+25;
-			} else if ((elLinkLc.contains('myspacetv.com') || elLinkLc.contains('vids.myspace.com')) &&
-						elLinkLc.contains('vids.individual&videoid=') && this.flashDetected) {
-				elMovieType = 'ms';
-				elHeight = (elWidth*0.5625).round()+40;
-			} else if (elLinkLc.contains('video.google.com/videoplay?docid=') && this.flashDetected) {
-				elMovieType = 'gv';
-				elHeight = (elWidth*0.5625).round()+26;
 			} else if (elLinkLc.test(/vimeo.com\/\d/) && this.flashDetected) {
 				elMovieType = 'vm';
 			} else if (elLinkLc.contains('vevo.com/watch') && this.flashDetected) {
@@ -262,7 +255,7 @@ var FlowerMoviebox = new Class({
 			this.currentMovie = document.getElementById(this.options.movieObjectID);
 			// delay setting state to allow QT to be fully initialized...helps fix audio bug
 			(function(){this.state = 11;}.bind(this)).delay(1200);
-		} else if (this.movieType == 'yt' || this.movieType == 'gv' || this.movieType == 'vm' || this.movieType == 'ms' || this.movieType == 'vv') {
+		} else if (this.movieType == 'yt' || this.movieType == 'vm' || this.movieType == 'vv') {
 			var videoObjURL = this.parseVideoURL(this.movieurl);
 			this.overlayContentSpc.set('html','<object id="'+this.options.movieObjectID+'" standby="loading video..." type="application/x-shockwave-flash" width="'+this.renderboxwidth+'" height="'+this.renderboxheight+'" data="'+videoObjURL+'"><param name="movie" value="'+videoObjURL+'" /><param name="bgcolor" value="'+this.options.contentspcbg+'" /><param name="allowFullScreen" value="true" /><param name="wmode" value="window" /><param name="allowScriptAccess" value="always" /></object>');
 			this.currentMovie = document.id(this.options.movieObjectID);
@@ -293,15 +286,6 @@ var FlowerMoviebox = new Class({
 			miscVar = newUrl.indexOf('&');
 			if (miscVar > -1) {newUrl = newUrl.substr(0,miscVar);}
 			newUrl += '&amp;autoplay=1';
-		} else if (urlLc.contains('fuseaction=vids.individual&videoid=')) {
-			newUrl = 'http://lads.myspace.com/videos/vplayer.swf?m=';
-			miscVar = urlLc.lastIndexOf('=')+1;
-			newUrl += urlLc.substr(miscVar,urlLc.length - miscVar);
-			newUrl += '&v=2&type=video&a=1';
-		} else if (urlLc.contains('video.google.com/videoplay?docid=')) {
-			newUrl = this.movieurl.replace(/videoplay/i,'googleplayer.swf');
-			miscVar = newUrl.indexOf('&');
-			if (miscVar > -1) {newUrl = newUrl.substr(0,miscVar);}
 		} else if (urlLc.contains('vimeo.com/')) {
 			newUrl = this.movieurl.replace('vimeo.com/','vimeo.com/moogaloop.swf?clip_id=');
 			newUrl += '&amp;server=vimeo.com&amp;fullscreen=1&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;js_api=1&amp;autoplay=1';
@@ -350,7 +334,7 @@ window.addEvent('domready', function(){
 	} else {
 		var moviebox = new FlowerMoviebox();
 		// auto-attach to movie links
-		$$('a[href$=.mov],a[href$=.mp4],a[href$=.MOV],a[href$=.MP4],a[href^=http://www.youtube.com/watch?v],a[href^=http://youtube.com/watch?v],a[href^=http://vimeo.com/],a[href^=http://www.vimeo.com/],a[href^=http://video.google.com/videoplay?docid],a[href^=http://www.youtube.com/watch?v],a[href^=http://myspacetv.com/index.cfm?fuseaction=vids.individual&videoid],a[href^=http://vids.myspace.com/index.cfm?fuseaction=vids.individual&videoid]').each(function(element){
+		$$('a[href$=.mov],a[href$=.mp4],a[href$=.MOV],a[href$=.MP4],a[href^=http://www.youtube.com/watch?v],a[href^=http://youtube.com/watch?v],a[href^=http://vimeo.com/],a[href^=http://www.vimeo.com/],a[href^=http://www.youtube.com/watch?v]').each(function(element){
 			moviebox.attachToElement(element);
 		});
 	}
